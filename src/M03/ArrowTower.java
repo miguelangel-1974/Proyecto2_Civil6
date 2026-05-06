@@ -6,6 +6,18 @@ public class ArrowTower extends DefenseUnit {
 
 	}
 
+	public int attack() {
+		return 0;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		
+	}
+
+	public int getActualArmor() {
+		return 0;
+	}
+
 	public int getFoodCost() {
 		return 0;
 	}
@@ -30,4 +42,8 @@ public class ArrowTower extends DefenseUnit {
 		return 0;
 	}
 
+	public void resetArmor() {
+		
+	}
+	
 }
