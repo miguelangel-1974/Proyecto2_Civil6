@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  {{> header}}
+  <link rel="stylesheet" href="/estils.css">
+  <title>La Meva Civilització</title>
+</head>
+<body>
+  {{> menu}}
+
+  <main class="container">
+    <h1>🏛️ Estat de la Civilització</h1>
+    <p>Dades actualitzades des de la base de dades Proxmox</p>
+
+    <section class="cols-2">
+      {{#each recursos}}
+      <article class="card">
+        <h2>{{nom_recurs}}</h2>
+        <p style="font-size: 2rem;">{{quantitat}}</p>
+      </article>
+      {{/each}}
+    </section>
+  </main>
+
+  {{> footer}}
+</body>
+</html>
