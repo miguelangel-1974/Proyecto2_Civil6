@@ -5,6 +5,18 @@ public class RocketLauncherTower extends DefenseUnit {
 	public RocketLauncherTower(int armor, int baseDamage) {
 
 	}
+	
+	public int attack() {
+		return 0;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		
+	}
+
+	public int getActualArmor() {
+		return 0;
+	}
 
 	public int getFoodCost() {
 		return 0;
@@ -30,4 +42,7 @@ public class RocketLauncherTower extends DefenseUnit {
 		return 0;
 	}
 
+	public void resetArmor() {
+		
+	}
 }

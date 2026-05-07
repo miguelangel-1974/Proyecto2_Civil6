@@ -36,6 +36,14 @@ public abstract class DefenseUnit implements MilitaryUnit, Variables {
 		this.baseDamage = baseDamage;
 	}
 
+	public int getExperience() {
+		return experience;
+	}
+
+	public void setExperience(int experience) {
+		this.experience = experience;
+	}
+
 	public boolean isSanctified() {
 		return sanctified;
 	}
@@ -43,41 +51,5 @@ public abstract class DefenseUnit implements MilitaryUnit, Variables {
 	public void setSanctified(boolean sanctified) {
 		this.sanctified = sanctified;
 	}
-
-	public int attack() {
-		return 0;
-	}
-
-	public void takeDamage(int receivedDamage) {
-
-	}
-
-	public int getActualArmor() {
-		return 0;
-	}
-
-	public void resetArmor() {
-
-	}
-
-	public void setExperience(int n) {
-		this.experience = n;
-	}
-
-	public int getExperience() {
-		return experience;
-	}
-
-	public abstract int getFoodCost();
-
-	public abstract int getWoodCost();
-
-	public abstract int getIronCost();
-
-	public abstract int getManaCost();
-
-	public abstract int getChanceGeneratinWaste();
-
-	public abstract int getChanceAttackAgain();
-
+	
 }

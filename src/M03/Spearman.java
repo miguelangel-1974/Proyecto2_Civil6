@@ -10,6 +10,18 @@ public class Spearman extends AttackUnit {
 
 	}
 
+	public int attack() {
+		return 0;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		
+	}
+
+	public int getActualArmor() {
+		return 0;
+	}
+
 	public int getFoodCost() {
 		return 0;
 	}
@@ -34,4 +46,8 @@ public class Spearman extends AttackUnit {
 		return 0;
 	}
 
+	public void resetArmor() {
+		
+	}
+	
 }

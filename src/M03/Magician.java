@@ -5,6 +5,18 @@ public class Magician extends SpecialUnit {
 	public Magician(int armor, int baseDamage) {
 
 	}
+	
+	public int attack() {
+		return 0;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		
+	}
+
+	public int getActualArmor() {
+		return 0;
+	}
 
 	public int getFoodCost() {
 		return 0;
@@ -30,4 +42,8 @@ public class Magician extends SpecialUnit {
 		return 0;
 	}
 
+	public void resetArmor() {
+		
+	}
+	
 }

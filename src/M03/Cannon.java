@@ -10,6 +10,18 @@ public class Cannon extends AttackUnit {
 
 	}
 
+	public int attack() {
+		return 0;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		
+	}
+
+	public int getActualArmor() {
+		return 0;
+	}
+
 	public int getFoodCost() {
 		return 0;
 	}
@@ -32,6 +44,10 @@ public class Cannon extends AttackUnit {
 
 	public int getChanceAttackAgain() {
 		return 0;
+	}
+
+	public void resetArmor() {
+		
 	}
 
 }

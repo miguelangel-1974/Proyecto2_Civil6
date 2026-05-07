@@ -20,12 +20,13 @@ public class Civilization {
 
 	private int battles;
 
-	private ArrayList<ArrayList<MilitaryUnit>> army;
-
+	// private ArrayList<ArrayList<MilitaryUnit>> army;
+	ArrayList<MilitaryUnit> army = new ArrayList();
+	
 	public Civilization() {
 
 	}
-
+	
 	public int getTechnologyDefense() {
 		return technologyDefense;
 	}
@@ -122,11 +123,11 @@ public class Civilization {
 		this.battles = battles;
 	}
 
-	public ArrayList<ArrayList<MilitaryUnit>> getArmy() {
+	public ArrayList<MilitaryUnit> getArmy() {
 		return army;
 	}
 
-	public void setArmy(ArrayList<ArrayList<MilitaryUnit>> army) {
+	public void setArmy(ArrayList<MilitaryUnit> army) {
 		this.army = army;
 	}
 
