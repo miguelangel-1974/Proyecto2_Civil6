@@ -2,46 +2,93 @@ package M03;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ConexionBD {
 
-    // 1. Configuramos los parámetros del servidor y la BD
-    // Nota: Usamos localhost si el programa corre en el mismo servidor que la BD.
-    // Si corre desde tu casa, cambia localhost por ieticloudpro.ieti.cat
-    private final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private final String URL = "jdbc:mysql://ieticloudpro.ieti.cat:3306/civilizations_db?serverTimezone=UTC";
-    private final String USER = "admincivil6"; // El usuario que creamos para Java
-    private final String PASSWORD = "Civil6Admin"; // La contraseña que le pusiste
+    private String driver = "com.mysql.cj.jdbc.Driver";
+    // private String urlDatos = "jdbc:mysql://localhost:3307/civilizations_db?serverTimezone=UTC";
+    private String urlDatos = "jdbc:mysql://localhost/civilizations_db?serverTimezone=UTC";
+    private String user = "admincivil6";
+    private String pass = "Civil6Admin";
 
-    private Connection connection;
+    private Connection conn;
 
     public ConexionBD() {
-        // Constructor vacío
+        
     }
 
     public Connection getConnection() {
-        return connection;
+        return conn;
     }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
+    public void setConnection(Connection conn) {
+        this.conn = conn;
     }
 
-    public void connect() throws ClassNotFoundException, SQLException {
-        // Cargar el driver
-        Class.forName(DRIVER);
-        
-        // Crear la conexión (Teoría: DriverManager.getConnection)
-        connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        
-        System.out.println("Conexión a Civilizations_DB establecida con éxito.");
+    public void connect() {
+    	try {
+    		Class.forName(driver);
+    		System.out.println("Driver cargado correctamente");
+    		
+    		conn = DriverManager.getConnection(urlDatos, user, pass);
+    		System.out.println("Conxion a BD establecida con éxito.");
+    	} catch (ClassNotFoundException e) {
+    		System.out.println("Driver no se ha cargado correctamente!!");
+    	} catch (SQLException e) {
+    		System.out.println("Conxion no creada correctamente!!");
+    	}
     }
-
-    public void disconnect() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-            System.out.println("Conexión cerrada.");
+    
+    public int login(String user, String password) {
+    	int userID = -1;
+    	
+    	String sql = "SELECT user_id FROM Users WHERE username = ? AND password_hash = ?";
+    	
+    	try {
+    		PreparedStatement ps = conn.prepareStatement(sql);
+    		ps.setString(1, user);
+    		ps.setString(2, password);
+    		
+    		ResultSet rs = ps.executeQuery();
+    		
+    		if (rs.next() ) {
+    			userID = rs.getInt("user_id");
+    			System.out.println("Login exitoso. Bienvenido, " + user+"!");
+    		} else {
+    			System.out.println("Usuario o contraseña incorrectos.");
+    		}
+    	} catch (SQLException e) {
+            System.out.println("Error al intentar realizar el login.");
+            e.printStackTrace();
+        }
+		return userID;
+    }
+    
+    public void createUser(String user, String password) {    	
+    	String sql = "SELECT user_id FROM Users WHERE username = ?";
+    	String insert = "INSERT INTO Users (username, password_hash) VALUES (?,?)";
+    	
+    	try {
+    		PreparedStatement ps = conn.prepareStatement(sql);
+     		ps.setString(1, user);
+     		
+     		ResultSet rs = ps.executeQuery();
+     		if (rs.next() ) {
+    			System.out.println("Usuario no disponible");
+    		} else {
+    			ps = conn.prepareStatement(insert);
+    			
+    			ps.setString(1, user);
+    			ps.setString(2, password);
+    			ps.executeUpdate();
+    			System.out.println("Usuario creado correctamente!");
+    		}
+    	} catch (SQLException e) {
+             System.out.println("Error al intentar realizar el login.");
+             e.printStackTrace();
         }
     }
 }
