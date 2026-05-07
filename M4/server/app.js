@@ -18,19 +18,19 @@ if (!isProxmox) {
     port: 3306,
     user: 'appuser',
     password: '1234',
-    database: 'sakila'
+    database: 'civilizations_db'
   });
 } else {
   db.init({
     host: '127.0.0.1',
     port: 3306,
-    user: 'super',
+    user: 'root',
     password: '1234',
-    database: 'sakila'
+    database: 'civilizations_db'
   });
 }
 
-// Static files - ONLY ONCE
+// Static files
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 
@@ -47,148 +47,107 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// Registrar "Helpers .hbs" aquí
+// Registrar "Helpers .hbs"
 hbs.registerHelper('eq', (a, b) => a == b);
 hbs.registerHelper('gt', (a, b) => a > b);
 
 // Partials de Handlebars
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// Route
+// --- RUTES ---
+
+// 1. Pàgina Principal (Inici)
 app.get('/', async (req, res) => {
   try {
-
-    const moviesRows = await db.query(`
-      SELECT 
-        f.film_id,
-        f.title,
-        f.release_year,
-        GROUP_CONCAT(CONCAT(a.first_name,' ',a.last_name) SEPARATOR ', ') AS actors
-      FROM film f
-      LEFT JOIN film_actor fa ON fa.film_id = f.film_id
-      LEFT JOIN actor a ON a.actor_id = fa.actor_id
-      GROUP BY f.film_id
-      ORDER BY f.film_id
-      LIMIT 5;
+    const battlesRows = await db.query(`
+      SELECT id_battle, date, result 
+      FROM Battle_log 
+      ORDER BY date DESC 
+      LIMIT 2;
     `);
 
-    const categoriesRows = await db.query(`
-      SELECT category_id, name
-      FROM category
-      ORDER BY category_id
-      LIMIT 5;
-    `);
-
-    const moviesJson = db.table_to_json(moviesRows, {
-      film_id: 'number',
-      title: 'string',
-      release_year: 'number',
-      actors: 'string'
+    const battlesJson = db.table_to_json(battlesRows, {
+      id_battle: 'number',
+      date: 'string',
+      result: 'string'
     });
-
-    const categoriesJson = db.table_to_json(categoriesRows, {
-      category_id: 'number',
-      name: 'string'
-    });
-
-    const commonData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
-    );
 
     res.render('index', {
-      movies: moviesJson,
-      categories: categoriesJson,
-      common: commonData
+      ultimesBatalles: battlesJson
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).send('Error BD');
   }
 });
 
-app.get('/movies', async (req, res) => {
+// 2. Batalles (Llistat complet)
+app.get('/batalles', async (req, res) => {
   try {
+    const allBattlesRows = await db.query("SELECT id_battle, date, result FROM Battle_log ORDER BY date DESC");
+    const totalRows = await db.query("SELECT COUNT(*) as total FROM Battle_log");
 
-    const moviesRows = await db.query(`
-      SELECT 
-        f.film_id,
-        f.title,
-        f.release_year,
-        f.description,
-        GROUP_CONCAT(CONCAT(a.first_name,' ',a.last_name) SEPARATOR ', ') AS actors
-      FROM film f
-      LEFT JOIN film_actor fa ON fa.film_id = f.film_id
-      LEFT JOIN actor a ON a.actor_id = fa.actor_id
-      GROUP BY f.film_id
-      ORDER BY f.film_id
-      LIMIT 15;
-    `);
-
-    const moviesJson = db.table_to_json(moviesRows, {
-      film_id: 'number',
-      title: 'string',
-      release_year: 'number',
-      description: 'string',
-      actors: 'string'
+    const battlesJson = db.table_to_json(allBattlesRows, {
+      id_battle: 'number',
+      date: 'string',
+      result: 'string'
     });
 
-    const commonData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
-    );
-
-    res.render('movies', {
-      movies: moviesJson,
-      common: commonData
+    res.render('batalles', {
+      batalles: battlesJson,
+      totalBatalles: totalRows[0].total
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).send('Error BD');
   }
 });
 
-app.get('/customers', async (req, res) => {
+// 3. Informe de batalla (?informe=id)
+app.get('/informe', async (req, res) => {
   try {
+    const id = req.query.informe;
+    const statsRows = await db.query("SELECT * FROM Battle_stats WHERE id_battle = ?", [id]);
 
-    const customersRows = await db.query(`
-      SELECT 
-        c.customer_id,
-        c.first_name,
-        c.last_name,
-        GROUP_CONCAT(f.title ORDER BY r.rental_date DESC SEPARATOR ', ') AS rentals
-      FROM customer c
-      LEFT JOIN rental r ON r.customer_id = c.customer_id
-      LEFT JOIN inventory i ON i.inventory_id = r.inventory_id
-      LEFT JOIN film f ON f.film_id = i.film_id
-      GROUP BY c.customer_id
-      ORDER BY c.customer_id
-      LIMIT 25;
-    `);
-
-    const customersJson = db.table_to_json(customersRows, {
-      customer_id: 'number',
-      first_name: 'string',
-      last_name: 'string',
-      rentals: 'string'
+    res.render('informe', {
+      id_batalla: id,
+      fusta: statsRows[0]?.wood_gained || 0,
+      or: statsRows[0]?.gold_gained || 0,
+      menjar: statsRows[0]?.food_gained || 0
     });
-
-    const commonData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
-    );
-
-    res.render('customers', {
-      customers: customersJson,
-      common: commonData
-    });
-
   } catch (err) {
     console.error(err);
     res.status(500).send('Error BD');
   }
 });
 
-// Start server
+// 4. Civilització (Recursos)
+app.get('/civilitzacio', async (req, res) => {
+  try {
+    const civRows = await db.query("SELECT * FROM Civilization_stats LIMIT 1");
+    
+    const recursosJson = [
+      { nom_recurs: 'Fusta', quantitat: civRows[0].wood },
+      { nom_recurs: 'Or', quantitat: civRows[0].gold },
+      { nom_recurs: 'Ferro', quantitat: civRows[0].iron },
+      { nom_recurs: 'Mana', quantitat: civRows[0].mana }
+    ];
+
+    res.render('civilitzacio', {
+      recursos: recursosJson
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error BD');
+  }
+});
+
+// 5. Programadors
+app.get('/programadors', (req, res) => {
+  res.render('programadors');
+});
+
+// Start server (Estructura demanada)
 const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
   console.log(`http://localhost:${port}/batalles`);
