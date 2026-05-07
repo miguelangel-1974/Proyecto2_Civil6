@@ -6,6 +6,8 @@ public class Main {
 	private Scanner sc = new Scanner(System.in);
 	
 	public static void main(String[] args) {
+		VentanaPrincipal ventanaPrincipal = new VentanaPrincipal();
+		
 		Main app = new Main();
 		
 		ConexionBD conexion = new ConexionBD();
