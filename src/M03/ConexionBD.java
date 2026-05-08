@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ConexionBD {
 
@@ -100,17 +101,19 @@ public class ConexionBD {
         String sql = "INSERT INTO Civilization_stats (user_id, name) VALUES (?, ?)";
         
         try {
-        	PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            
             ps.setInt(1, userID);
             ps.setString(2, nombreCiv);
             ps.executeUpdate();
             
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-            	System.out.println("Error: El usuario ya tiene una partida activa.");
                 idGenerado = rs.getInt(1);
+                System.out.println("Partida creada con ID: " + idGenerado);
             }
         } catch (SQLException e) {
+            System.out.println("Error: El usuario ya tiene una partida activa o hubo un fallo de conexión.");
             e.printStackTrace();
         }
         return idGenerado;

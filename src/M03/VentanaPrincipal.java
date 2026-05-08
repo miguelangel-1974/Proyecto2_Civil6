@@ -22,9 +22,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VentanaPrincipal extends JFrame {
-	private PanelInicioSesion panelIniciarSesion;
 	private ConexionBD conexion;
 	private int userID = -1;
 	
@@ -34,7 +35,7 @@ public class VentanaPrincipal extends JFrame {
         setBounds(0,0,700,500);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Civilizations");
-        setResizable(false);
+        setResizable(true);
         setLocationRelativeTo(null);
         mostrarInicioSesion();
         
@@ -58,7 +59,7 @@ public class VentanaPrincipal extends JFrame {
 	
 	public void loginExitoso(int userID) {
 		this.userID = userID;
-		cambiarPanel(new PanelPartida(this, conexion));
+		cambiarPanel(new PanelPartida(this, conexion, this.userID));
 	}
 }
 
@@ -110,7 +111,7 @@ class PanelInicioSesion extends JPanel implements ActionListener {
 		botonSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
 		botonSalir.addActionListener(this);
 		
-		add(Box.createVerticalStrut(140));
+		add(Box.createVerticalStrut(getHeight() / 2));
 		add(botonIniciarSesion);
 		add(Box.createVerticalStrut(15));
 		add(botonCrearUsuario);
@@ -216,29 +217,28 @@ class PanelInicioSesion extends JPanel implements ActionListener {
 	}
 }
 
-class PanelPartida extends JPanel {
+class PanelPartida extends JPanel implements Variables {
 	private VentanaPrincipal ventana;
 	private ConexionBD conexion;
+	private int userID;
 	private Image logo;
 	
-	public PanelPartida(VentanaPrincipal ventana, ConexionBD conexion) {
+	public PanelPartida(VentanaPrincipal ventana, ConexionBD conexion, int userID) {
 		this.ventana = ventana;
 		this.conexion = conexion;
+		this.userID = userID;
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		// Cargamos la misma imagen de fondo
+
 		try {
 			logo = ImageIO.read(new File("src/M03/img/logo.jpg"));
 	    } catch (IOException e) {
 	    	System.out.println("No se ha encontrado imagen de fondo.");
 	    }
-		
-		// Crear los nuevos botones
+
 		JButton botonCrearPartida = new JButton("Crear Partida");
 		JButton botonContinuarPartida = new JButton("Continuar Partida");
-		
-		// Estilos (puedes ajustar los colores)
+
 		botonCrearPartida.setMaximumSize(new Dimension(200, 40));
 		botonCrearPartida.setBackground(Color.ORANGE);
 		botonCrearPartida.setFont(new Font("Arial", Font.BOLD, 18)); 
@@ -251,22 +251,20 @@ class PanelPartida extends JPanel {
 		
 		botonCrearPartida.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Pedimos el nombre de la civilización al usuario
-                String nombreCiv = JOptionPane.showInputDialog(ventana, "Introduce el nombre de tu Civilización:", "Nueva Partida", JOptionPane.QUESTION_MESSAGE);
-                
-                if (nombreCiv != null && !nombreCiv.trim().isEmpty()) {
-                    // Obtenemos el userID que guardamos en la VentanaPrincipal tras el login
-                    int userID = ventana.getUserID(); 
+                String nombre = JOptionPane.showInputDialog(ventana, "Nombre de la civilización:");
+                if (nombre != null && !nombre.trim().isEmpty()) {
+                    int idCiv = conexion.crearNuevaPartida(userID, nombre);
                     
-                    // Llamamos a un método de conexión (que deberás añadir a ConexionBD) para insertar en Civilization_stats
-                    int idPartida = conexion.crearNuevaPartida(userID, nombreCiv);
-                    
-                    if (idPartida != -1) {
-                        // Si se crea bien, cambiamos al panel del juego principal con el nuevo fondo
-                        // ventana.cambiarPanel(new PanelJuegoPrincipal(ventana, idPartida)); 
-                        JOptionPane.showMessageDialog(ventana, "¡Partida '" + nombreCiv + "' creada con éxito!");
+                    if (idCiv != -1) {
+                        Civilization miCiv = new Civilization();
+
+                        Timer timerReloj = new Timer();
+                        ResourceGenerator generador = new ResourceGenerator(miCiv);
+                        timerReloj.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
+                        
+                        ventana.cambiarPanel(new PanelJuego(ventana, miCiv));
                     } else {
-                        JOptionPane.showMessageDialog(ventana, "Error al crear la partida. Quizás ya tienes una activa.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(ventana, "Error al crear partida.");
                     }
                 }
             }
@@ -274,7 +272,6 @@ class PanelPartida extends JPanel {
 		
 		botonContinuarPartida.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Aquí iría la lógica para buscar si el userID ya tiene una partida en Civilization_stats
                 JOptionPane.showMessageDialog(ventana, "Buscando partida guardada...");
             }
         });
@@ -303,11 +300,17 @@ class PanelJuego extends JPanel {
         this.miCiv = civ;
         
         try {
-            // Aquí pones la ruta de tu fondo de mapa
             fondoPartida = ImageIO.read(new File("src/M03/img/fondo_partida.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+        	public void run() {
+        		repaint();
+        	}
+        };
+        timer.scheduleAtFixedRate(task, 0, 50);
     }
 
     protected void paintComponent(Graphics g) {
@@ -316,10 +319,13 @@ class PanelJuego extends JPanel {
             g.drawImage(fondoPartida, 0, 0, getWidth(), getHeight(), this);
         }
         
+        g.setColor(new Color(0,0,0, 150));
+        g.fillRect(0, 0, getWidth(), 40);
+        
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Madera: " + miCiv.getWood(), 20, 30);
-        g.drawString("Hierro: " + miCiv.getIron(), 20, 60);
-        // ...
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        String recursos = String.format("Madera: %d | Hierro: %d | Comida: %d | Mana: %d", 
+                          miCiv.getWood(), miCiv.getIron(), miCiv.getFood(), miCiv.getMana());
+        g.drawString(recursos, 20, 25);
     }
 }
