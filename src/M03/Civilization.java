@@ -2,7 +2,7 @@ package M03;
 
 import java.util.ArrayList;
 
-public class Civilization {
+public class Civilization implements Variables{
 
 	private int technologyDefense;
 	private int technologyAtack;
@@ -20,13 +20,31 @@ public class Civilization {
 
 	private int battles;
 
-	// private ArrayList<ArrayList<MilitaryUnit>> army;
-	ArrayList<MilitaryUnit> army = new ArrayList();
-	
-	public Civilization() {
+	private ArrayList<ArrayList<MilitaryUnit>> army;
 
+	public Civilization() {
+		this.technologyDefense = 0;
+		this.technologyAtack = 0;
+
+		this.wood = 0;
+		this.iron = 0;
+		this.food = 0;
+		this.mana = 0;
+
+		this.magicTower = 0;
+		this.church = 0;
+		this.farm = 0;
+		this.smithy = 0;
+		this.carpentry = 0;
+
+		this.battles = 0;
+
+		this.army = new ArrayList<ArrayList<MilitaryUnit>>();
+		for (int i = 0; i < 9; i++) {
+			this.army.add(new ArrayList<MilitaryUnit>());
+		}
 	}
-	
+
 	public int getTechnologyDefense() {
 		return technologyDefense;
 	}
@@ -123,45 +141,112 @@ public class Civilization {
 		this.battles = battles;
 	}
 
-	public ArrayList<MilitaryUnit> getArmy() {
+	public ArrayList<ArrayList<MilitaryUnit>> getArmy() {
 		return army;
 	}
 
-	public void setArmy(ArrayList<MilitaryUnit> army) {
+	public void setArmy(ArrayList<ArrayList<MilitaryUnit>> army) {
 		this.army = army;
 	}
 
 	public void newChurch() throws ResourceException {
+		if(this.food < FOOD_COST_CHURCH || this.wood < WOOD_COST_CHURCH || this.iron < IRON_COST_CHURCH || this.mana < MANA_COST_CHURCH) {
+			throw new ResourceException("No hay recursos suficientes para construir una CHURCH.");
+		}
 
+			
+		this.food= this.food-FOOD_COST_CHURCH;
+		this.wood= this.wood-WOOD_COST_CHURCH;
+		this.iron=this.iron-IRON_COST_CHURCH;
+		this.mana=this.mana-MANA_COST_CHURCH;
+		this.church+=1;
+		System.out.println("CHURCH construida. Total de churchs: "+this.church);
+	
 	}
 
 	public void newMagicTower() throws ResourceException {
-
+		if (this.food < FOOD_COST_MAGICTOWER || this.wood < WOOD_COST_MAGICTOWER  || this.iron < IRON_COST_MAGICTOWER ) {
+			throw new ResourceException("No hay recursos suficientes para construir una TORRE MAGICA.");
+		}
+ 
+		this.food = this.food- FOOD_COST_MAGICTOWER ;
+		this.wood = this.wood - WOOD_COST_MAGICTOWER ;
+		this.iron = this.iron- IRON_COST_MAGICTOWER ;
+		this.magicTower+=1;
+ 
+		System.out.println("magic tower construida. Total granjas: " + this.magicTower);
 	}
 
 	public void newFarm() throws ResourceException {
-
+		if (this.food < FOOD_COST_FARM || this.wood < WOOD_COST_FARM || this.iron < IRON_COST_FARM) {
+			throw new ResourceException("No hay recursos suficientes para construir una granja.");
+		}
+ 
+		this.food = this.food- FOOD_COST_FARM;
+		this.wood = this.wood - WOOD_COST_FARM;
+		this.iron = this.iron- IRON_COST_FARM;
+		this.farm+=1;
+ 
+		System.out.println("Granja construida. Total granjas: " + this.farm);
 	}
 
 	public void newCarpentry() throws ResourceException {
-
+		if (this.food < FOOD_COST_CARPENTRY || this.wood < WOOD_COST_CARPENTRY || this.iron < IRON_COST_CARPENTRY) {
+			throw new ResourceException("No hay recursos suficientes para construir una  CARPentry");
+		}
+ 
+		this.food = this.food- FOOD_COST_CARPENTRY;
+		this.wood = this.wood - WOOD_COST_CARPENTRY;
+		this.iron = this.iron- IRON_COST_CARPENTRY;
+		this.carpentry+=1;
+ 
+		System.out.println("carpintry construida. Total CARPINTERY: " + this.carpentry);
 	}
 
 	public void newSmithy() throws ResourceException {
-
+		if (this.food < FOOD_COST_SMITHY || this.wood < WOOD_COST_SMITHY || this.iron < IRON_COST_SMITHY) {
+			throw new ResourceException("No hay recursos suficientes para construir una SMITHY");
+		}
+ 
+		this.food = this.food- FOOD_COST_SMITHY;
+		this.wood = this.wood - WOOD_COST_SMITHY;
+		this.iron = this.iron- IRON_COST_SMITHY;
+		this.smithy+=1;
+ 
+		System.out.println("smithy construida. Total CARPINTERY: " + this.smithy);
 	}
 
 	public void upgradeTechnologyDefense() throws ResourceException {
-
+ 
+		int coste = UPGRADE_BASE_DEFENSE_TECHNOLOGY_IRON_COST + this.technologyDefense * UPGRADE_PLUS_DEFENSE_TECHNOLOGY_IRON_COST;
+ 
+		if (this.iron < coste) {
+			throw new ResourceException("No hay hierro suficiente para mejorar la tecnologia de defensa. Coste: " + coste);
+		}
+ 
+		this.iron = this.iron - coste;
+		this.technologyDefense+=1;
+ 
+		System.out.println("Tecnologia de defensa mejorada. Nuevo nivel: " + this.technologyDefense + " (coste: " + coste + " hierro)");
 	}
 
 	public void upgradeTechnologyAttack() throws ResourceException {
-
+ 
+		int coste = UPGRADE_BASE_ATTACK_TECHNOLOGY_IRON_COST + this.technologyAtack * UPGRADE_PLUS_ATTACK_TECHNOLOGY_IRON_COST;
+ 
+		if (this.iron < coste) {
+			throw new ResourceException("No hay hierro suficiente para mejorar la tecnologia de ataque. Coste: " + coste);
+		}
+ 
+		this.iron = this.iron - coste;
+		this.technologyAtack+=1;
+ 
+		System.out.println("Tecnologia de ataque mejorada. Nuevo nivel: " + this.technologyAtack + " (coste: " + coste + " hierro)");
 	}
 
 	public void newSwordsman(int n) throws ResourceException {
-
-	}
+	
+	} 
 
 	public void newSpearman(int n) throws ResourceException {
 
@@ -196,7 +281,38 @@ public class Civilization {
 	}
 
 	public void printStats() {
-
+		System.out.println("=========== CIVILIZATION STATS ===========");
+		System.out.println();
+		System.out.println("Recursos:");
+		System.out.println("  Madera: " + this.wood);
+		System.out.println("  Hierro: " + this.iron);
+		System.out.println("  Comida: " + this.food);
+		System.out.println("  Mana:   " + this.mana);
+		System.out.println();
+		System.out.println("Edificios:");
+		System.out.println("  Granjas:        " + this.farm);
+		System.out.println("  Carpinterias:   " + this.carpentry);
+		System.out.println("  Herrerias:      " + this.smithy);
+		System.out.println("  Iglesias:       " + this.church);
+		System.out.println("  Torres magicas: " + this.magicTower);
+		System.out.println();
+		System.out.println("Tecnologias:");
+		System.out.println("  Defensa: nivel " + this.technologyDefense);
+		System.out.println("  Ataque:  nivel " + this.technologyAtack);
+		System.out.println();
+		System.out.println("Ejercito:");
+		System.out.println("  Espadachines:        " + this.army.get(0).size());
+		System.out.println("  Lanceros:            " + this.army.get(1).size());
+		System.out.println("  Ballesteros:         " + this.army.get(2).size());
+		System.out.println("  Canones:             " + this.army.get(3).size());
+		System.out.println("  Torres de flechas:   " + this.army.get(4).size());
+		System.out.println("  Catapultas:          " + this.army.get(5).size());
+		System.out.println("  Torres lanzacohetes: " + this.army.get(6).size());
+		System.out.println("  Magos:               " + this.army.get(7).size());
+		System.out.println("  Sacerdotes:          " + this.army.get(8).size());
+		System.out.println();
+		System.out.println("Batallas libradas: " + this.battles);
+		System.out.println("==========================================");
 	}
 
 }
