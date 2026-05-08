@@ -67,7 +67,7 @@ public class ConexionBD {
 		return userID;
     }
     
-    public void createUser(String user, String password) {    	
+    public boolean createUser(String user, String password) {    	
     	String sql = "SELECT user_id FROM Users WHERE username = ?";
     	String insert = "INSERT INTO Users (username, password_hash) VALUES (?,?)";
     	
@@ -78,6 +78,7 @@ public class ConexionBD {
      		ResultSet rs = ps.executeQuery();
      		if (rs.next() ) {
     			System.out.println("Usuario no disponible");
+    			return false;
     		} else {
     			ps = conn.prepareStatement(insert);
     			
@@ -85,10 +86,33 @@ public class ConexionBD {
     			ps.setString(2, password);
     			ps.executeUpdate();
     			System.out.println("Usuario creado correctamente!");
+    			return true;
     		}
     	} catch (SQLException e) {
              System.out.println("Error al intentar realizar el login.");
-             e.printStackTrace();
+             e.printStackTrace();             
         }
+    	return false;
+    }
+    
+    public int crearNuevaPartida(int userID, String nombreCiv) {
+        int idGenerado = -1;
+        String sql = "INSERT INTO Civilization_stats (user_id, name) VALUES (?, ?)";
+        
+        try {
+        	PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, userID);
+            ps.setString(2, nombreCiv);
+            ps.executeUpdate();
+            
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+            	System.out.println("Error: El usuario ya tiene una partida activa.");
+                idGenerado = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idGenerado;
     }
 }
