@@ -10,5 +10,5 @@ public class Main {
 		
 		VentanaPrincipal ventanaPrincipal = new VentanaPrincipal(conexion);
 	}
-}
+
 }
