@@ -595,35 +595,68 @@ class PanelJuego extends JPanel {
 		contenido.setBackground(new Color(40, 40, 40));
 		contenido.setBorder(new EmptyBorder(12, 12, 12, 12));
  
-		contenido.add(botonConstruir(v, "Granja",        "Comida +5/s",    60,  0,  30, 0));
-		contenido.add(botonConstruir(v, "Carpintería",   "Madera +5/s",    0,   60, 30, 0));
-		contenido.add(botonConstruir(v, "Herrería",      "Hierro +5/s",    30,  30, 60, 0));
-		contenido.add(botonConstruir(v, "Torre mágica",  "Maná +3/s",      40,  40, 40, 60));
-		contenido.add(botonConstruir(v, "Iglesia",       "Moral +10",      50,  20, 20, 0));
+		contenido.add(botonConstruir("Granja", miCiv));
+		contenido.add(botonConstruir("Carpintería", miCiv));
+		contenido.add(botonConstruir("Herrería", miCiv));
+		contenido.add(botonConstruir("Torre mágica", miCiv));
+		contenido.add(botonConstruir("Iglesia", miCiv));
  
 		v.add(contenido);
 		v.setVisible(true);
 	}
- 
-	private JButton botonConstruir(JFrame padre, String nombre, String descripcion,
-			int costoComida, int costoMadera, int costoHierro, int costoMana) {
-		JButton btn = new JButton(nombre + "  —  " + descripcion
-				+ "  [C:" + costoComida + " M:" + costoMadera
-				+ " H:" + costoHierro + " Ma:" + costoMana + "]");
+	
+	private JButton botonConstruir(String nombre, Civilization miCiv) {
+		JButton btn = new JButton(nombre);
 		btn.setBackground(new Color(30, 100, 50));
 		btn.setForeground(Color.WHITE);
 		btn.setFont(new Font("Arial", Font.PLAIN, 13));
 		btn.setFocusPainted(false);
 		btn.setBorderPainted(false);
-//		btn.addActionListener(e -> {
-//			boolean ok = miCiv.construir(nombre, costoComida, costoMadera, costoHierro, costoMana);
-//			if (ok) {
-//				agregarLog("Construido: " + nombre);
-//			} else {
-//				JOptionPane.showMessageDialog(padre, "Recursos insuficientes para construir " + nombre + ".");
-//			}
-//		});
+		btn.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            if (nombre == "Granja")  {
+	            	try {
+						miCiv.newFarm();
+					} catch (ResourceException e1) {
+						
+						System.out.println("No hay recursos suficientes para construir una granja.");
+					}
+	            }
+	            if (nombre == "Carpintería")  {
+	            	try {
+						miCiv.newCarpentry();
+					} catch (ResourceException e1) {
+						System.out.println("No hay recursos suficientes para construir una carpinteria.");
+					}
+	            }
+	            if (nombre == "Herrería")  {
+	            	try {
+						miCiv.newSmithy();
+					} catch (ResourceException e1) {
+						System.out.println("No hay recursos suficientes para construir una herreria.");
+					}
+	            }
+	            if (nombre == "Torre mágica")  {
+	            	try {
+						miCiv.newMagicTower();
+					} catch (ResourceException e1) {
+						System.out.println("No hay recursos suficientes para construir una torre magica.");
+					}
+	            }
+	            if (nombre == "Iglesia")  {
+	            	try {
+	            		miCiv.setMana(10000);
+	            		miCiv.setIron(12000);
+						miCiv.newChurch();
+					} catch (ResourceException e1) {
+						JOptionPane.showMessageDialog(ventana, "Buscando partida guardada...");
+						System.out.println("No hay recursos suficientes para construir una iglesia.");
+					}
+	            }
+	        }
+	    });
 		return btn;
+		
 	}
  
 	private void abrirVentanaUnidades(String titulo) {
