@@ -1,7 +1,9 @@
 package M03;
 
 public interface Variables {
-
+	// Variables de tiempos
+	public final int RESOURCES_GENERATOR_TIME = 10000;
+	
 	// resources available to create the first enemy fleet
 	public final int IRON_BASE_ENEMY_ARMY = 26000;
 	public final int WOOD_BASE_ENEMY_ARMY = 180000;
