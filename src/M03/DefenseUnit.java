@@ -1,5 +1,5 @@
 package M03;
-//hola hola prueba prueba
+
 public abstract class DefenseUnit implements MilitaryUnit, Variables {
 
 	private int armor;
@@ -10,6 +10,26 @@ public abstract class DefenseUnit implements MilitaryUnit, Variables {
 
 	public DefenseUnit() {
 
+	}
+
+	public int attack() {
+		int damage = this.baseDamage+ (this.experience * PLUS_ATTACK_UNIT_PER_EXPERIENCE_POINT * this.baseDamage / 100);
+		if (this.sanctified) {
+			damage = damage + (PLUS_ATTACK_UNIT_SANCTIFIED * this.baseDamage / 100);
+		}
+		return damage;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		this.armor = this.armor - receivedDamage;
+	}
+
+	public int getActualArmor() {
+		return this.armor;
+	}
+
+	public void resetArmor() {
+		this.armor = this.initialArmor;
 	}
 
 	public int getArmor() {
@@ -51,5 +71,5 @@ public abstract class DefenseUnit implements MilitaryUnit, Variables {
 	public void setSanctified(boolean sanctified) {
 		this.sanctified = sanctified;
 	}
-	
+
 }

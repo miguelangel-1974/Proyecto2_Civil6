@@ -11,6 +11,23 @@ public abstract class SpecialUnit implements MilitaryUnit, Variables {
 
 	}
 
+	public int attack() {
+		int damage = this.baseDamage+ (this.experience * PLUS_ATTACK_UNIT_PER_EXPERIENCE_POINT * this.baseDamage / 100);
+		return damage;
+	}
+
+	public void takeDamage(int receivedDamage) {
+		this.armor = this.armor - receivedDamage;
+	}
+
+	public int getActualArmor() {
+		return this.armor;
+	}
+
+	public void resetArmor() {
+		this.armor = this.initialArmor;
+	}
+
 	public int getArmor() {
 		return armor;
 	}
@@ -42,5 +59,5 @@ public abstract class SpecialUnit implements MilitaryUnit, Variables {
 	public void setExperience(int experience) {
 		this.experience = experience;
 	}
-	
+
 }

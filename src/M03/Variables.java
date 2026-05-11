@@ -139,6 +139,16 @@ public interface Variables {
 	public final int ARMOR_ARROWTOWER = 200;
 	public final int ARMOR_CATAPULT = 1200;
 	public final int ARMOR_ROCKETLAUNCHERTOWER = 7000;
+	
+	//ARMOR ESPECIALES
+	public final int ARMOR_MAGICIAN = 500;
+	public final int ARMOR_PRIEST = 300;
+	// PLUS ARMOR ESPECIALES
+	public final int PLUS_ARMOR_MAGICIAN_BY_TECHNOLOGY = 5;
+	public final int PLUS_ARMOR_PRIEST_BY_TECHNOLOGY = 5;
+	//BASE DAMAGE DEL PRIEST
+	public final int BASE_DAMAGE_PRIEST = 0;
+	public final int PLUS_ATTACK_PRIEST_BY_TECHNOLOGY = 0;
 
 	// Attack Units armor increase percentage per tech level
 	public final int PLUS_ARMOR_SWORDSMAN_BY_TECHNOLOGY = 5;

@@ -3,51 +3,43 @@ package M03;
 public class Swordsman extends AttackUnit {
 
 	public Swordsman(int armor, int baseDamage) {
-
+		this.setArmor(armor);
+		this.setInitialArmor(armor);
+		this.setBaseDamage(baseDamage);
+		this.setExperience(0);
+		this.setSanctified(false);
 	}
 
 	public Swordsman() {
-
-	}
-
-	public int attack() {
-		return 0;
-	}
-
-	public void takeDamage(int receivedDamage) {
-		
-	}
-
-	public int getActualArmor() {
-		return 0;
+		this.setArmor(ARMOR_SWORDSMAN);
+		this.setInitialArmor(ARMOR_SWORDSMAN);
+		this.setBaseDamage(BASE_DAMAGE_SWORDSMAN);
+		this.setExperience(0);
+		this.setSanctified(false);
 	}
 
 	public int getFoodCost() {
-		return 0;
+		return FOOD_COST_SWORDSMAN;
 	}
 
 	public int getWoodCost() {
-		return 0;
+		return WOOD_COST_SWORDSMAN;
 	}
 
 	public int getIronCost() {
-		return 0;
+		return IRON_COST_SWORDSMAN;
 	}
 
 	public int getManaCost() {
-		return 0;
+		return MANA_COST_SWORDSMAN;
 	}
 
 	public int getChanceGeneratinWaste() {
-		return 0;
+		return CHANCE_GENERATNG_WASTE_SWORDSMAN;
 	}
 
 	public int getChanceAttackAgain() {
-		return 0;
-	}
-
-	public void resetArmor() {
-		
+		return CHANCE_ATTACK_AGAIN_SWORDSMAN;
 	}
 
 }
