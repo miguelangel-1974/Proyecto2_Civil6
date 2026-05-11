@@ -14,10 +14,10 @@ const isProxmox = !!process.env.PM2_HOME;
 const db = new MySQL();
 if (!isProxmox) {
   db.init({
-    host: 'localhost',
-    port: 3306,
-    user: 'appuser',
-    password: '1234',
+    host: '127.0.0.1', // No posis 'localhost', posa la IP
+    port: 3307,
+    user: 'root',
+    password: 'rootcivil6',
     database: 'civilizations_db'
   });
 } else {
@@ -25,7 +25,7 @@ if (!isProxmox) {
     host: '127.0.0.1',
     port: 3306,
     user: 'root',
-    password: '1234',
+    password: 'rootcivil6',
     database: 'civilizations_db'
   });
 }
@@ -47,112 +47,78 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// Registrar "Helpers .hbs"
+// Helpers
 hbs.registerHelper('eq', (a, b) => a == b);
 hbs.registerHelper('gt', (a, b) => a > b);
 
-// Partials de Handlebars
+// Partials
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// --- RUTES ---
+// --- ROUTES ---
 
-// 1. Pàgina Principal (Inici)
+// Index
 app.get('/', async (req, res) => {
   try {
-    const battlesRows = await db.query(`
-      SELECT id_battle, date, result 
-      FROM Battle_log 
-      ORDER BY date DESC 
-      LIMIT 2;
-    `);
+    const rows = await db.query("SELECT num_battle, log_entry FROM Battle_log ORDER BY num_battle DESC LIMIT 2");
+    const battlesJson = db.table_to_json(rows, { num_battle: 'number', log_entry: 'string' });
+    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
 
-    const battlesJson = db.table_to_json(battlesRows, {
-      id_battle: 'number',
-      date: 'string',
-      result: 'string'
-    });
-
-    res.render('index', {
-      ultimesBatalles: battlesJson
-    });
+    res.render('index', { ultimesBatalles: battlesJson, common: commonData });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error BD');
+    res.status(500).send('Error BD a la Principal');
   }
 });
 
-// 2. Batalles (Llistat complet)
+// Batalles
 app.get('/batalles', async (req, res) => {
   try {
-    const allBattlesRows = await db.query("SELECT id_battle, date, result FROM Battle_log ORDER BY date DESC");
-    const totalRows = await db.query("SELECT COUNT(*) as total FROM Battle_log");
-
-    const battlesJson = db.table_to_json(allBattlesRows, {
-      id_battle: 'number',
-      date: 'string',
-      result: 'string'
-    });
-
-    res.render('batalles', {
-      batalles: battlesJson,
-      totalBatalles: totalRows[0].total
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error BD');
-  }
+    const rows = await db.query("SELECT num_battle, log_entry FROM Battle_log ORDER BY num_battle DESC");
+    const battlesJson = db.table_to_json(rows, { num_battle: 'number', log_entry: 'string' });
+    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
+    res.render('batalles', { batalles: battlesJson, common: commonData });
+  } catch (err) { res.status(500).send('Error BD'); }
 });
 
-// 3. Informe de batalla (?informe=id)
-app.get('/informe', async (req, res) => {
-  try {
-    const id = req.query.informe;
-    const statsRows = await db.query("SELECT * FROM Battle_stats WHERE id_battle = ?", [id]);
-
-    res.render('informe', {
-      id_batalla: id,
-      fusta: statsRows[0]?.wood_gained || 0,
-      or: statsRows[0]?.gold_gained || 0,
-      menjar: statsRows[0]?.food_gained || 0
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error BD');
-  }
-});
-
-// 4. Civilització (Recursos)
+// Civilitzacio
 app.get('/civilitzacio', async (req, res) => {
   try {
-    const civRows = await db.query("SELECT * FROM Civilization_stats LIMIT 1");
-    
-    const recursosJson = [
-      { nom_recurs: 'Fusta', quantitat: civRows[0].wood },
-      { nom_recurs: 'Or', quantitat: civRows[0].gold },
-      { nom_recurs: 'Ferro', quantitat: civRows[0].iron },
-      { nom_recurs: 'Mana', quantitat: civRows[0].mana }
+    const rows = await db.query("SELECT wood, gold, iron, mana FROM Civilization_stats LIMIT 1");
+    const r = rows[0] || {};
+    const recursosList = [
+      { nom_recurs: 'Fusta', quantitat: r.wood || 0 },
+      { nom_recurs: 'Or', quantitat: r.gold || 0 },
+      { nom_recurs: 'Ferro', quantitat: r.iron || 0 },
+      { nom_recurs: 'Mana', quantitat: r.mana || 0 }
     ];
-
-    res.render('civilitzacio', {
-      recursos: recursosJson
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error BD');
-  }
+    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
+    res.render('civilitzacio', { recursos: recursosList, common: commonData });
+  } catch (err) { res.status(500).send('Error BD'); }
 });
 
-// 5. Programadors
+// Informe
+app.get('/informe', async (req, res) => {
+  try {
+    const id = req.query.informe || 1;
+    const rows = await db.query("SELECT wood_gained, gold_gained, food_gained FROM Battle_stats WHERE num_battle = ?", [id]);
+    const s = rows[0] || { wood_gained: 0, gold_gained: 0, food_gained: 0 };
+    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
+    res.render('informe', { id_batalla: id, fusta: s.wood_gained, or: s.gold_gained, menjar: s.food_gained, common: commonData });
+  } catch (err) { res.status(500).send('Error BD'); }
+});
+
+// Programadors
 app.get('/programadors', (req, res) => {
-  res.render('programadors');
+  const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
+  res.render('programadors', { common: commonData });
 });
 
-// Start server (Estructura demanada)
+// Start server
 const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
   console.log(`http://localhost:${port}/batalles`);
-  console.log(`http://localhost:${port}/informe`);
   console.log(`http://localhost:${port}/civilitzacio`);
+  console.log(`http://localhost:${port}/informe`);
   console.log(`http://localhost:${port}/programadors`);
 });
 
