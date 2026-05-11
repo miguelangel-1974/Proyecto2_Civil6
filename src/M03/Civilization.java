@@ -467,8 +467,8 @@ public class Civilization implements Variables{
         throw new BuildingException("No tienes Torres de mago para crear magos.");
     }
 
-    int armor = ARMOR_MAGICIAN+ (this.technologyDefense * PLUS_ARMOR_MAGICIAN_BY_TECHNOLOGY * ARMOR_MAGICIAN / 100);
-    int damage = BASE_DAMAGE_MAGICIAN+ (this.technologyAtack * PLUS_ATTACK_MAGICIAN_BY_TECHNOLOGY * BASE_DAMAGE_MAGICIAN / 100);
+    int armor =0;
+    int damage =  0;
 
     int creados = 0;
 
@@ -500,8 +500,8 @@ public class Civilization implements Variables{
 		if (church<1) {
 			throw new BuildingException("No tienes Iglesias para crear sacerdotes");
 		}
-		 int armor = ARMOR_PRIEST+ (this.technologyDefense * PLUS_ARMOR_PRIEST_BY_TECHNOLOGY * ARMOR_PRIEST / 100);
-		    int damage = BASE_DAMAGE_PRIEST+ (this.technologyAtack * PLUS_ATTACK_PRIEST_BY_TECHNOLOGY * BASE_DAMAGE_PRIEST / 100);
+		 int armor = 0;
+		    int damage = 0;
 
 		    int creados = 0;
 
