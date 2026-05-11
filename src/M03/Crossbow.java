@@ -3,52 +3,44 @@ package M03;
 public class Crossbow extends AttackUnit {
 
 	public Crossbow(int armor, int baseDamage) {
-
+		this.setArmor(armor);
+		this.setInitialArmor(armor);
+		this.setBaseDamage(baseDamage);
+		this.setExperience(0);
+		this.setSanctified(false);
 	}
 
 	public Crossbow() {
-
+		this.setArmor(ARMOR_CROSSBOW);
+		this.setInitialArmor(ARMOR_CROSSBOW);
+		this.setBaseDamage(BASE_DAMAGE_CROSSBOW);
+		this.setExperience(0);
+		this.setSanctified(false);
 	}
 
-	public int attack() {
-		return 0;
-	}
-
-	public void takeDamage(int receivedDamage) {
-		
-	}
-
-	public int getActualArmor() {
-		return 0;
-	}
 
 	public int getFoodCost() {
-		return 0;
+		return FOOD_COST_CROSSBOW;
 	}
 
 	public int getWoodCost() {
-		return 0;
+		return WOOD_COST_CROSSBOW;
 	}
 
 	public int getIronCost() {
-		return 0;
+		return IRON_COST_CROSSBOW;
 	}
 
 	public int getManaCost() {
-		return 0;
+		return MANA_COST_CROSSBOW;
 	}
 
 	public int getChanceGeneratinWaste() {
-		return 0;
+		return CHANCE_GENERATNG_WASTE_CROSSBOW;
 	}
 
 	public int getChanceAttackAgain() {
-		return 0;
-	}
-
-	public void resetArmor() {
-
-		
+		return CHANCE_ATTACK_AGAIN_CROSSBOW;
 	}
 	
 }

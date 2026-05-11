@@ -245,39 +245,289 @@ public class Civilization implements Variables{
 	}
 
 	public void newSwordsman(int n) throws ResourceException {
+		int armor = ARMOR_SWORDSMAN+ (this.technologyDefense * PLUS_ARMOR_SWORDSMAN_BY_TECHNOLOGY * ARMOR_SWORDSMAN / 100);
+	    int damage = BASE_DAMAGE_SWORDSMAN+ (this.technologyAtack * PLUS_ATTACK_SWORDSMAN_BY_TECHNOLOGY * BASE_DAMAGE_SWORDSMAN / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_SWORDSMAN
+	            && this.wood >= WOOD_COST_SWORDSMAN
+	            && this.food >= FOOD_COST_SWORDSMAN) {
+
+	        this.iron = this.iron - IRON_COST_SWORDSMAN;
+	        this.wood = this.wood - WOOD_COST_SWORDSMAN;
+	        this.food = this.food - FOOD_COST_SWORDSMAN;
+	        
+
+	        this.army.get(0).add(new Swordsman(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " espadachines.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " espadachines, solo se crearon " + creados + ".");
+	    }
 	
 	} 
 
 	public void newSpearman(int n) throws ResourceException {
+		int armor = ARMOR_SPEARMAN+ (this.technologyDefense * PLUS_ARMOR_SPEARMAN_BY_TECHNOLOGY * ARMOR_SPEARMAN / 100);
+	    int damage = BASE_DAMAGE_SPEARMAN+ (this.technologyAtack * PLUS_ATTACK_SPEARMAN_BY_TECHNOLOGY * BASE_DAMAGE_SPEARMAN / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_SPEARMAN
+	            && this.wood >= WOOD_COST_SPEARMAN
+	            && this.food >= FOOD_COST_SPEARMAN) {
+
+	        this.iron = this.iron - IRON_COST_SPEARMAN;
+	        this.wood = this.wood - WOOD_COST_SPEARMAN;
+	        this.food = this.food - FOOD_COST_SPEARMAN;
+	        
+
+	        this.army.get(1).add(new Spearman(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " lanceros.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " lanceros, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newCrossbow(int n) throws ResourceException {
+		int armor = ARMOR_CROSSBOW+ (this.technologyDefense * PLUS_ARMOR_CROSSBOW_BY_TECHNOLOGY * ARMOR_CROSSBOW / 100);
+	    int damage = BASE_DAMAGE_CROSSBOW+ (this.technologyAtack * PLUS_ATTACK_CROSSBOW_BY_TECHNOLOGY * BASE_DAMAGE_CROSSBOW / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_CROSSBOW
+	            && this.wood >= WOOD_COST_CROSSBOW
+	            && this.food >= FOOD_COST_CROSSBOW) {
+
+	        this.iron = this.iron - IRON_COST_CROSSBOW;
+	        this.wood = this.wood - WOOD_COST_CROSSBOW;
+	        this.food = this.food - FOOD_COST_CROSSBOW;
+	        
+
+	        this.army.get(2).add(new Crossbow(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " ballesta.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " ballesta, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newCannon(int n) throws ResourceException {
+		int armor = ARMOR_CANNON+ (this.technologyDefense * PLUS_ARMOR_CANNON_BY_TECHNOLOGY * ARMOR_CANNON / 100);
+	    int damage = BASE_DAMAGE_CANNON+ (this.technologyAtack * PLUS_ATTACK_CANNON_BY_TECHNOLOGY * BASE_DAMAGE_CANNON / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_CANNON
+	            && this.wood >= WOOD_COST_CANNON
+	            && this.food >= FOOD_COST_CANNON) {
+
+	        this.iron = this.iron - IRON_COST_CANNON;
+	        this.wood = this.wood - WOOD_COST_CANNON;
+	        this.food = this.food - FOOD_COST_CANNON;
+	        
+
+	        this.army.get(3).add(new Cannon(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " cañones.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " cañones, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newArrowTower(int n) throws ResourceException {
+		int armor = ARMOR_ARROWTOWER+ (this.technologyDefense * PLUS_ARMOR_ARROWTOWER_BY_TECHNOLOGY * ARMOR_ARROWTOWER / 100);
+	    int damage = BASE_DAMAGE_ARROWTOWER+ (this.technologyAtack * PLUS_ATTACK_ARROWTOWER_BY_TECHNOLOGY * BASE_DAMAGE_ARROWTOWER / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_ARROWTOWER
+	            && this.wood >= WOOD_COST_ARROWTOWER
+	            && this.food >= FOOD_COST_ARROWTOWER) {
+
+	        this.iron = this.iron - IRON_COST_ARROWTOWER;
+	        this.wood = this.wood - WOOD_COST_ARROWTOWER;
+	        this.food = this.food - FOOD_COST_ARROWTOWER;
+	        
+
+	        this.army.get(4).add(new ArrowTower(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " torres arqueras.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " torres arqueras, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newCatapult(int n) throws ResourceException {
+		int armor = ARMOR_CATAPULT+ (this.technologyDefense * PLUS_ARMOR_CATAPULT_BY_TECHNOLOGY * ARMOR_CATAPULT / 100);
+	    int damage = BASE_DAMAGE_CATAPULT+ (this.technologyAtack * PLUS_ATTACK_CATAPULT_BY_TECHNOLOGY * BASE_DAMAGE_CATAPULT / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_CATAPULT
+	            && this.wood >= WOOD_COST_CATAPULT
+	            && this.food >= FOOD_COST_CATAPULT) {
+
+	        this.iron = this.iron - IRON_COST_CATAPULT;
+	        this.wood = this.wood - WOOD_COST_CATAPULT;
+	        this.food = this.food - FOOD_COST_CATAPULT;
+	        
+
+	        this.army.get(5).add(new Catapult(armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " catapultas.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " catapultas, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newRocketLauncher(int n) throws ResourceException {
+		int armor = ARMOR_ROCKETLAUNCHERTOWER+ (this.technologyDefense * PLUS_ARMOR_ROCKETLAUNCHERTOWER_BY_TECHNOLOGY * ARMOR_ROCKETLAUNCHERTOWER / 100);
+	    int damage = BASE_DAMAGE_ROCKETLAUNCHERTOWER+ (this.technologyAtack * PLUS_ATTACK_ROCKETLAUNCHERTOWER_BY_TECHNOLOGY * BASE_DAMAGE_ROCKETLAUNCHERTOWER / 100);
+
+	    int creados = 0;
+
+	    while (creados < n
+	            && this.iron >= IRON_COST_ROCKETLAUNCHERTOWER
+	            && this.wood >= WOOD_COST_ROCKETLAUNCHERTOWER
+	            && this.food >= FOOD_COST_ROCKETLAUNCHERTOWER) {
+
+	        this.iron = this.iron - IRON_COST_ROCKETLAUNCHERTOWER;
+	        this.wood = this.wood - WOOD_COST_ROCKETLAUNCHERTOWER;
+	        this.food = this.food - FOOD_COST_ROCKETLAUNCHERTOWER;
+	        
+
+	        this.army.get(6).add(new RocketLauncherTower (armor, damage));
+
+	        creados+=1;
+	    }
+
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " torres de cohetes.");
+	    }
+
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " torres de cohetes, solo se crearon " + creados + ".");
+	    }
 
 	}
 
 	public void newMagician(int n) throws ResourceException, BuildingException {
 
+    if (this.magicTower < 1) {
+        throw new BuildingException("No tienes Torres de mago para crear magos.");
+    }
+
+    int armor =0;
+    int damage =  0;
+
+    int creados = 0;
+
+    while (creados < n
+            && this.iron >= IRON_COST_MAGICIAN
+            && this.wood >= WOOD_COST_MAGICIAN
+            && this.food >= FOOD_COST_MAGICIAN
+            && this.mana >= MANA_COST_MAGICIAN) {
+
+        this.iron = this.iron - IRON_COST_MAGICIAN;
+        this.wood = this.wood - WOOD_COST_MAGICIAN;
+        this.food = this.food - FOOD_COST_MAGICIAN;
+        this.mana = this.mana - MANA_COST_MAGICIAN;
+
+        this.army.get(7).add(new Magician(armor, damage));
+
+        creados+=1;
+    }
+
+    if (creados > 0) {
+        System.out.println("Se han reclutado " + creados + " magos.");
+    }
+
+    if (creados < n) {
+        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
+    }
 	}
-
 	public void newPriest(int n) throws ResourceException, BuildingException {
+		if (church<1) {
+			throw new BuildingException("No tienes Iglesias para crear sacerdotes");
+		}
+		 int armor = 0;
+		    int damage = 0;
 
+		    int creados = 0;
+
+		    while (creados < n
+		            && this.iron >= IRON_COST_PRIEST
+		            && this.wood >= WOOD_COST_PRIEST
+		            && this.food >= FOOD_COST_PRIEST
+		            && this.mana >= MANA_COST_PRIEST) {
+
+		        this.iron = this.iron - IRON_COST_PRIEST;
+		        this.wood = this.wood - WOOD_COST_PRIEST;
+		        this.food = this.food - FOOD_COST_PRIEST;
+		        this.mana = this.mana - MANA_COST_PRIEST;
+
+		        this.army.get(8).add(new Priest(armor, damage));
+
+		        creados+=1;
+		    }
+
+		    if (creados > 0) {
+		        System.out.println("Se han reclutado " + creados + " sacerdotes.");
+		    }
+
+		    if (creados < n) {
+		        throw new ResourceException("Recursos insuficientes. Querias " + n + " sacerdotes, solo se crearon " + creados + ".");
+		    }
 	}
 
 	public void printStats() {
