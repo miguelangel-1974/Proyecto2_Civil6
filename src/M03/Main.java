@@ -1,6 +1,6 @@
 package M03;
 
-import java.util.Scanner;
+import M03.GUI.VentanaPrincipal;
 
 public class Main {
 	
