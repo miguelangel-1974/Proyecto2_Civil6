@@ -21,8 +21,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -33,15 +37,20 @@ import java.util.TimerTask;
 public class VentanaPrincipal extends JFrame {
 	private ConexionBD conexion;
 	private int userID = -1;
+	private GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	private Rectangle bounds = ge.getMaximumWindowBounds();
 	
 	VentanaPrincipal(ConexionBD conexion) {
 		this.conexion = conexion;
 		
-        setBounds(0,0,10000,10000);
+		setBounds(bounds);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Civilizations");
         setResizable(true);
         setLocationRelativeTo(null);
+        
         mostrarInicioSesion();
         
         setVisible(true);
@@ -99,29 +108,33 @@ class PanelInicioSesion extends JPanel implements ActionListener {
 		botonSalir = new JButton("Salir");
 		
 		botonIniciarSesion.setMaximumSize(new Dimension(300, 60));
+		botonIniciarSesion.setPreferredSize(new Dimension(300, 60));
 		botonIniciarSesion.setBackground(Color.GREEN);
 		botonIniciarSesion.setFont(new Font("Arial", Font.BOLD, 22)); 
 		botonIniciarSesion.setAlignmentX(Component.CENTER_ALIGNMENT);
 		botonIniciarSesion.addActionListener(this);
 		
 		botonCrearUsuario.setMaximumSize(new Dimension(300, 60));
+		botonCrearUsuario.setPreferredSize(new Dimension(300, 60));
 		botonCrearUsuario.setBackground(Color.CYAN);
 		botonCrearUsuario.setFont(new Font("Arial", Font.BOLD, 22)); 
 		botonCrearUsuario.setAlignmentX(Component.CENTER_ALIGNMENT);
 		botonCrearUsuario.addActionListener(this);
 		
 		botonSalir.setMaximumSize(new Dimension(300, 60));
+		botonSalir.setPreferredSize(new Dimension(300, 60));
 		botonSalir.setBackground(Color.PINK);
 		botonSalir.setFont(new Font("Arial", Font.BOLD, 22)); 
 		botonSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
 		botonSalir.addActionListener(this);
 		
-		add(Box.createVerticalStrut(400));
+		add(Box.createVerticalGlue());
 		add(botonIniciarSesion);
 		add(Box.createVerticalStrut(15));
 		add(botonCrearUsuario);
 		add(Box.createVerticalStrut(15));
 		add(botonSalir);
+		add(Box.createVerticalGlue());
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -245,11 +258,13 @@ class PanelPartida extends JPanel implements Variables {
 		JButton botonContinuarPartida = new JButton("Continuar Partida");
 
 		botonCrearPartida.setMaximumSize(new Dimension(300, 60));
+		botonCrearPartida.setPreferredSize(new Dimension(300, 60));
 		botonCrearPartida.setBackground(Color.ORANGE);
 		botonCrearPartida.setFont(new Font("Arial", Font.BOLD, 22)); 
 		botonCrearPartida.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
 		botonContinuarPartida.setMaximumSize(new Dimension(300, 60));
+		botonContinuarPartida.setPreferredSize(new Dimension(300, 60));
 		botonContinuarPartida.setBackground(Color.YELLOW);
 		botonContinuarPartida.setFont(new Font("Arial", Font.BOLD, 22)); 
 		botonContinuarPartida.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -281,10 +296,11 @@ class PanelPartida extends JPanel implements Variables {
             }
         });
 		
-		add(Box.createVerticalStrut(400));
+		add(Box.createVerticalGlue());
 		add(botonCrearPartida);
 		add(Box.createVerticalStrut(20));
 		add(botonContinuarPartida);
+		add(Box.createVerticalGlue());
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -453,9 +469,7 @@ class PanelJuego extends JPanel {
 					abrirVentanaStats();
 					break;
 				case "cerrar_sesion":
-					int confirm = JOptionPane.showConfirmDialog(ventana,
-							"¿Cerrar sesión y volver al menú principal?", "Cerrar sesión",
-							JOptionPane.YES_NO_OPTION);
+					int confirm = JOptionPane.showConfirmDialog(ventana, "¿Cerrar sesión y volver al menú principal?", "Cerrar sesión", JOptionPane.YES_NO_OPTION);
 					if (confirm == JOptionPane.YES_OPTION) {
 						ventana.mostrarInicioSesion();
 					}
@@ -614,44 +628,30 @@ class PanelJuego extends JPanel {
 		btn.setBorderPainted(false);
 		btn.addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
-	            if (nombre == "Granja")  {
-	            	try {
-						miCiv.newFarm();
-					} catch (ResourceException e1) {
-						
-						System.out.println("No hay recursos suficientes para construir una granja.");
-					}
-	            }
-	            if (nombre == "Carpintería")  {
-	            	try {
-						miCiv.newCarpentry();
-					} catch (ResourceException e1) {
-						System.out.println("No hay recursos suficientes para construir una carpinteria.");
-					}
-	            }
-	            if (nombre == "Herrería")  {
-	            	try {
-						miCiv.newSmithy();
-					} catch (ResourceException e1) {
-						System.out.println("No hay recursos suficientes para construir una herreria.");
-					}
-	            }
-	            if (nombre == "Torre mágica")  {
-	            	try {
-						miCiv.newMagicTower();
-					} catch (ResourceException e1) {
-						System.out.println("No hay recursos suficientes para construir una torre magica.");
-					}
-	            }
-	            if (nombre == "Iglesia")  {
-	            	try {
-	            		miCiv.setMana(10000);
-	            		miCiv.setIron(12000);
-						miCiv.newChurch();
-					} catch (ResourceException e1) {
-						JOptionPane.showMessageDialog(ventana, "Buscando partida guardada...");
-						System.out.println("No hay recursos suficientes para construir una iglesia.");
-					}
+	        	try {
+		            if (nombre.equals("Granja"))  {
+		            	miCiv.newFarm();
+		            }
+		            if (nombre.equals("Carpintería"))  {
+		            	miCiv.newCarpentry();
+		            }
+		            if (nombre.equals("Herrería"))  {
+		            	miCiv.newSmithy();
+		            }
+		            if (nombre.equals("Torre mágica"))  {
+		            	miCiv.newMagicTower();
+		            }
+		            if (nombre.equals("Iglesia"))  {
+		            	miCiv.setFood(miCiv.getFood()+10000);
+	            		miCiv.setWood(miCiv.getWood()+10000);
+	            		miCiv.setMana(miCiv.getMana()+10000);
+	            		miCiv.setIron(miCiv.getIron()+10000);
+	            		// miCiv.newChurch();
+		            }
+		            actualizarUI();
+		            repaint();
+	        	} catch (ResourceException ex) {
+	                JOptionPane.showMessageDialog(ventana, "No hay recursos suficientes para construir: " + nombre);
 	            }
 	        }
 	    });
@@ -754,6 +754,9 @@ class PanelJuego extends JPanel {
 		super.paintComponent(g);
 		if (fondoPartida != null) {
 			g.drawImage(fondoPartida, 0, 0, getWidth(), getHeight(), this);
+		}
+		if (miCiv.getFarm() >= 1) {
+			g.drawImage(fondoPartida, 20, 30, 100, 100, this);
 		}
 	}
 }
