@@ -1,0 +1,23 @@
+<div class="text-center mb-12">
+    <h1 class="text-5xl font-serif font-bold text-red-500 mb-4">Registro de Batallas Globales</h1>
+    <div class="inline-block glass-panel px-8 py-4 rounded-full">
+        <p class="text-xl">Total de batallas en el Servidor: <span class="text-3xl font-bold text-white ml-2">{{totalBattles}}</span></p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {{#if battles}}
+        {{#each battles}}
+        <div class="glass-panel p-6 rounded-xl border-l-4 border-red-500 hover:bg-slate-800 transition transform hover:-translate-y-1">
+            <h3 class="text-2xl font-bold mb-2">Batalla #{{this.num_battle}}</h3>
+            <div class="flex gap-4 mb-4 text-sm">
+                <span class="bg-amber-900/50 text-amber-500 px-3 py-1 rounded">🪵 +{{this.wood_acquired}}</span>
+                <span class="bg-gray-800 text-gray-300 px-3 py-1 rounded">🪨 +{{this.iron_acquired}}</span>
+            </div>
+            <a href="/informe?informe={{this.num_battle}}" class="block text-center bg-slate-700 hover:bg-red-600 text-white py-2 rounded-lg transition">Leer Informe Detallado</a>
+        </div>
+        {{/each}}
+    {{else}}
+        <div class="col-span-3 text-center py-10 text-slate-500">No han habido batallas. La paz reina (de momento).</div>
+    {{/if}}
+</div>

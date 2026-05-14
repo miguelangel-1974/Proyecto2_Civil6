@@ -467,6 +467,7 @@ public class Civilization implements Variables{
 	        throw new BuildingException("No tienes Torres de mago para crear magos.");
 	    }
 	
+<<<<<<< HEAD
 	    int armor =0;
 	    int damage = BASE_DAMAGE_MAGICIAN + (this.technologyAtack * PLUS_ATTACK_MAGICIAN_BY_TECHNOLOGY * BASE_DAMAGE_MAGICIAN / 100);
 	
@@ -474,6 +475,15 @@ public class Civilization implements Variables{
 	    int creados = 0;
 	
 	    while (creados < n && this.iron >= IRON_COST_MAGICIAN
+=======
+	    int armor = 0;
+	    int damage = 0;
+	
+	    int creados = 0;
+	
+	    while (creados < n
+	            && this.iron >= IRON_COST_MAGICIAN
+>>>>>>> 12f23dd648b781cbbedd5b0fa577a4a2dd3c5c0f
 	            && this.wood >= WOOD_COST_MAGICIAN
 	            && this.food >= FOOD_COST_MAGICIAN
 	            && this.mana >= MANA_COST_MAGICIAN) {
@@ -496,6 +506,7 @@ public class Civilization implements Variables{
 	        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
 	    }
 	}
+	
 	public void newPriest(int n) throws ResourceException, BuildingException {
 		if (church<1) {
 			throw new BuildingException("No tienes Iglesias para crear sacerdotes");
