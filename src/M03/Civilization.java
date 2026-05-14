@@ -463,38 +463,38 @@ public class Civilization implements Variables{
 
 	public void newMagician(int n) throws ResourceException, BuildingException {
 
-    if (this.magicTower < 1) {
-        throw new BuildingException("No tienes Torres de mago para crear magos.");
-    }
-
-    int armor =0;
-    int damage =  0;
-
-    int creados = 0;
-
-    while (creados < n
-            && this.iron >= IRON_COST_MAGICIAN
-            && this.wood >= WOOD_COST_MAGICIAN
-            && this.food >= FOOD_COST_MAGICIAN
-            && this.mana >= MANA_COST_MAGICIAN) {
-
-        this.iron = this.iron - IRON_COST_MAGICIAN;
-        this.wood = this.wood - WOOD_COST_MAGICIAN;
-        this.food = this.food - FOOD_COST_MAGICIAN;
-        this.mana = this.mana - MANA_COST_MAGICIAN;
-
-        this.army.get(7).add(new Magician(armor, damage));
-
-        creados+=1;
-    }
-
-    if (creados > 0) {
-        System.out.println("Se han reclutado " + creados + " magos.");
-    }
-
-    if (creados < n) {
-        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
-    }
+	    if (this.magicTower < 1) {
+	        throw new BuildingException("No tienes Torres de mago para crear magos.");
+	    }
+	
+	    int armor =0;
+	    int damage = BASE_DAMAGE_MAGICIAN + (this.technologyAtack * PLUS_ATTACK_MAGICIAN_BY_TECHNOLOGY * BASE_DAMAGE_MAGICIAN / 100);
+	
+	
+	    int creados = 0;
+	
+	    while (creados < n && this.iron >= IRON_COST_MAGICIAN
+	            && this.wood >= WOOD_COST_MAGICIAN
+	            && this.food >= FOOD_COST_MAGICIAN
+	            && this.mana >= MANA_COST_MAGICIAN) {
+	
+	        this.iron = this.iron - IRON_COST_MAGICIAN;
+	        this.wood = this.wood - WOOD_COST_MAGICIAN;
+	        this.food = this.food - FOOD_COST_MAGICIAN;
+	        this.mana = this.mana - MANA_COST_MAGICIAN;
+	
+	        this.army.get(7).add(new Magician(armor, damage));
+	
+	        creados+=1;
+	    }
+	
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " magos.");
+	    }
+	
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
+	    }
 	}
 	public void newPriest(int n) throws ResourceException, BuildingException {
 		if (church<1) {
@@ -532,25 +532,21 @@ public class Civilization implements Variables{
 
 	public void printStats() {
 		System.out.println("=========== CIVILIZATION STATS ===========");
-		System.out.println();
-		System.out.println("Recursos:");
+		System.out.println("\nRecursos:");
 		System.out.println("  Madera: " + this.wood);
 		System.out.println("  Hierro: " + this.iron);
 		System.out.println("  Comida: " + this.food);
 		System.out.println("  Mana:   " + this.mana);
-		System.out.println();
-		System.out.println("Edificios:");
+		System.out.println("\nEdificios:");
 		System.out.println("  Granjas:        " + this.farm);
 		System.out.println("  Carpinterias:   " + this.carpentry);
 		System.out.println("  Herrerias:      " + this.smithy);
 		System.out.println("  Iglesias:       " + this.church);
 		System.out.println("  Torres magicas: " + this.magicTower);
-		System.out.println();
-		System.out.println("Tecnologias:");
+		System.out.println("\nTecnologias:");
 		System.out.println("  Defensa: nivel " + this.technologyDefense);
 		System.out.println("  Ataque:  nivel " + this.technologyAtack);
-		System.out.println();
-		System.out.println("Ejercito:");
+		System.out.println("\nEjercito:");
 		System.out.println("  Espadachines:        " + this.army.get(0).size());
 		System.out.println("  Lanceros:            " + this.army.get(1).size());
 		System.out.println("  Ballesteros:         " + this.army.get(2).size());
@@ -560,8 +556,8 @@ public class Civilization implements Variables{
 		System.out.println("  Torres lanzacohetes: " + this.army.get(6).size());
 		System.out.println("  Magos:               " + this.army.get(7).size());
 		System.out.println("  Sacerdotes:          " + this.army.get(8).size());
-		System.out.println();
-		System.out.println("Batallas libradas: " + this.battles);
+
+		System.out.println("\nBatallas libradas: " + this.battles);
 		System.out.println("==========================================");
 	}
 
