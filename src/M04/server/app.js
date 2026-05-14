@@ -1,40 +1,34 @@
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
 const hbs = require('hbs');
 const MySQL = require('./utilsMySQL');
 
 const app = express();
 const port = 3000;
-
-// Detectar si estem al Proxmox (si és pm2)
 const isProxmox = !!process.env.PM2_HOME;
 
-// Iniciar connexió MySQL
 const db = new MySQL();
 if (!isProxmox) {
   db.init({
     host: '127.0.0.1',
-    port: 3308, // Canvia'l aquí també
-    user: 'root',
-    password: 'rootcivil6',
+    port: 3306,
+    user: 'admincivil6',
+    password: 'Civil6Admin',
     database: 'civilizations_db'
   });
 } else {
   db.init({
     host: '127.0.0.1',
     port: 3306,
-    user: 'root',
-    password: 'rootcivil6',
+    user: 'admincivil6',
+    password: 'Civil6Admin',
     database: 'civilizations_db'
   });
 }
 
-// Static files
-app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 
-// Disable cache
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -43,93 +37,129 @@ app.use((req, res, next) => {
   next();
 });
 
-// Handlebars
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
-
-// Helpers
-hbs.registerHelper('eq', (a, b) => a == b);
-hbs.registerHelper('gt', (a, b) => a > b);
-
-// Partials
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// --- ROUTES ---
-
-// Index
+// 1. Página Inicio
 app.get('/', async (req, res) => {
   try {
-    const rows = await db.query("SELECT num_battle, log_entry FROM Battle_log ORDER BY num_battle DESC LIMIT 2");
-    const battlesJson = db.table_to_json(rows, { num_battle: 'number', log_entry: 'string' });
-    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
+    const rawBattles = await db.query(`SELECT * FROM Battle_stats ORDER BY num_battle DESC LIMIT 2`);
+    const battles = db.table_to_json(rawBattles, { num_battle: 'number', wood_acquired: 'number', iron_acquired: 'number' });
 
-    res.render('index', { ultimesBatalles: battlesJson, common: commonData });
+    // Cargar todas las partidas actuales
+    const rawPartidas = await db.query(`
+      SELECT u.username, c.name, c.food_amount, c.wood_amount, c.iron_amount, c.mana_amount, c.battles_counter 
+      FROM Civilization_stats c 
+      JOIN Users u ON c.user_id = u.user_id 
+      ORDER BY c.battles_counter DESC
+    `);
+    const partidas = db.table_to_json(rawPartidas);
+
+    res.render('index', { title: 'Inicio', battles, partidas });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error BD a la Principal');
+    res.status(500).send("Error BD");
   }
 });
 
-// Batalles
-app.get('/batalles', async (req, res) => {
+// 2. Mi Ciudad (Formulario de Login)
+app.get('/mi-ciudad', (req, res) => {
+  res.render('mi-ciudad', { title: 'Acceso a tu Ciudad' });
+});
+
+// 2.1 Mi Ciudad (Procesar Login)
+app.post('/mi-ciudad', async (req, res) => {
+  const { username, password } = req.body;
   try {
-    // Afegeix un log aquí per veure si arriba a fer la consulta
-    console.log("Intentant consultar batalles..."); 
-    const rows = await db.query("SELECT num_battle, log_entry FROM Battle_log ORDER BY num_battle DESC");
+    // Nota: Compara con password_hash de la tabla Users
+    const rawUser = await db.query(`SELECT user_id, username FROM Users WHERE username = '${username}' AND password_hash = '${password}'`);
     
-    const battlesJson = db.table_to_json(rows, { num_battle: 'number', log_entry: 'string' });
-    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
-
-    res.render('batalles', { batalles: battlesJson, common: commonData });
+    if (rawUser.length > 0) {
+      const user = rawUser[0];
+      const rawCivs = await db.query(`SELECT * FROM Civilization_stats WHERE user_id = ${user.user_id}`);
+      const civs = db.table_to_json(rawCivs);
+      
+      res.render('mi-ciudad', { title: 'Tus Partidas', user, civs });
+    } else {
+      res.render('mi-ciudad', { title: 'Acceso a tu Ciudad', error: 'Usuario o contraseña incorrectos. Inténtalo de nuevo.' });
+    }
   } catch (err) {
-    console.error("DETALL DE L'ERROR A BATALLES:", err); // Això et dirà per què falla exactament
-    res.status(500).send('Error BD');
+    console.error(err);
+    res.status(500).send("Error BD");
   }
 });
 
-// Civilitzacio
-app.get('/civilitzacio', async (req, res) => {
+// 2.2 Mi Ciudad (Detalles en grande)
+app.get('/mi-ciudad/detalles/:id', async (req, res) => {
+  const civId = req.params.id;
   try {
-    const rows = await db.query("SELECT wood, gold, iron, mana FROM Civilization_stats LIMIT 1");
-    const r = rows[0] || {};
-    const recursosList = [
-      { nom_recurs: 'Fusta', quantitat: r.wood || 0 },
-      { nom_recurs: 'Or', quantitat: r.gold || 0 },
-      { nom_recurs: 'Ferro', quantitat: r.iron || 0 },
-      { nom_recurs: 'Mana', quantitat: r.mana || 0 }
-    ];
-    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
-    res.render('civilitzacio', { recursos: recursosList, common: commonData });
-  } catch (err) { res.status(500).send('Error BD'); }
+    const rawStats = await db.query(`SELECT * FROM Civilization_stats WHERE civilization_id = ${civId}`);
+    const stats = rawStats.length > 0 ? db.table_to_json(rawStats)[0] : null;
+
+    if (!stats) return res.redirect('/mi-ciudad');
+
+    // Consultar tropas de ataque y defensa para dar más detalle
+    const rawAtk = await db.query(`SELECT type, count(*) as qty FROM attack_units_stats WHERE civilization_id = ${civId} GROUP BY type`);
+    const atkUnits = db.table_to_json(rawAtk);
+    
+    const rawDef = await db.query(`SELECT type, count(*) as qty FROM defense_units_stats WHERE civilization_id = ${civId} GROUP BY type`);
+    const defUnits = db.table_to_json(rawDef);
+
+    res.render('mi-ciudad-detalles', { title: `Detalles: ${stats.name}`, stats, atkUnits, defUnits });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error BD");
+  }
 });
 
-// Informe
+// 3. Batallas
+app.get('/batallas', async (req, res) => {
+  try {
+    const rawTotal = await db.query(`SELECT COUNT(*) as total FROM Battle_stats`);
+    const totalBattles = rawTotal.length > 0 ? rawTotal[0].total : 0;
+    
+    const rawBattles = await db.query(`SELECT * FROM Battle_stats ORDER BY num_battle DESC`);
+    const battles = db.table_to_json(rawBattles);
+    
+    res.render('batallas', { title: 'Registro de Batallas', totalBattles, battles });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error BD");
+  }
+});
+
+// 4. Informes de Batalla
 app.get('/informe', async (req, res) => {
   try {
-    const id = req.query.informe || 1;
-    const rows = await db.query("SELECT wood_gained, gold_gained, food_gained FROM Battle_stats WHERE num_battle = ?", [id]);
-    const s = rows[0] || { wood_gained: 0, gold_gained: 0, food_gained: 0 };
-    const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
-    res.render('informe', { id_batalla: id, fusta: s.wood_gained, or: s.gold_gained, menjar: s.food_gained, common: commonData });
-  } catch (err) { res.status(500).send('Error BD'); }
+    const idBatalla = req.query.informe;
+    if (!idBatalla) return res.redirect('/batallas');
+
+    const rawLogs = await db.query(`SELECT log_entry FROM Battle_log WHERE civilization_id = 1 AND num_battle = ${idBatalla} ORDER BY num_line ASC`);
+    const logs = db.table_to_json(rawLogs);
+
+    const rawSummary = await db.query(`SELECT * FROM Battle_stats WHERE civilization_id = 1 AND num_battle = ${idBatalla}`);
+    const summary = rawSummary.length > 0 ? db.table_to_json(rawSummary)[0] : null;
+
+    res.render('informe', { title: `Informe Batalla #${idBatalla}`, logs, summary, idBatalla });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error BD");
+  }
 });
 
-// Programadors
-app.get('/programadors', (req, res) => {
-  const commonData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8'));
-  res.render('programadors', { common: commonData });
+// 5. Programadores
+app.get('/programadores', (req, res) => {
+  res.render('programadores', { title: 'Equip de Desenvolupament' });
 });
 
-// Start server
 const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
-  console.log(`http://localhost:${port}/batalles`);
-  console.log(`http://localhost:${port}/civilitzacio`);
-  console.log(`http://localhost:${port}/informe`);
-  console.log(`http://localhost:${port}/programadors`);
+  console.log(`http://localhost:${port}/mi-ciudad`);
+  console.log(`http://localhost:${port}/batallas`);
+  console.log(`http://localhost:${port}/programadores`);
 });
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   await db.end();
   httpServer.close();

@@ -43,7 +43,6 @@ class PanelJuego extends JPanel implements ActionListener {
 	private int idCiv;
 	private int userID;
 	
-	
 	private Image fondoPartida;
 	private Image imgGranja, imgCarpinteria, imgHerreria, imgTorre_magica, imgIglesia;
  
@@ -91,6 +90,8 @@ class PanelJuego extends JPanel implements ActionListener {
         	}
         };
         timer.scheduleAtFixedRate(task, 0, 50);
+        
+        cargarEdificiosGuardados();
 	}
 
 	private JPanel crearPanelAcciones() {
@@ -162,23 +163,23 @@ class PanelJuego extends JPanel implements ActionListener {
 	    try {
 	        if (nombre.equals("Granja")) {
 	        	miCiv.newFarm();
-	        	edificiosColocados.add(new EdificioColocado(imgGranja, x, y, 200, 100));
+	        	edificiosColocados.add(new EdificioColocado(imgGranja, x, y, 200, 100, "Granja"));
 	        }
 	        if (nombre.equals("Carpintería")) {
 	        	miCiv.newCarpentry();
-	        	edificiosColocados.add(new EdificioColocado(imgCarpinteria, x, y, 180, 80));
+	        	edificiosColocados.add(new EdificioColocado(imgCarpinteria, x, y, 180, 80, "Carpintería"));
 	        }
 	        if (nombre.equals("Herrería")) {
 	        	miCiv.newSmithy();
-	        	edificiosColocados.add(new EdificioColocado(imgHerreria, x, y, 120, 120));
+	        	edificiosColocados.add(new EdificioColocado(imgHerreria, x, y, 120, 120, "Herrería"));
 	        }
 	        if (nombre.equals("Torre mágica")) {
 	        	miCiv.newMagicTower();
-	        	edificiosColocados.add(new EdificioColocado(imgTorre_magica, x, y, 50, 100));
+	        	edificiosColocados.add(new EdificioColocado(imgTorre_magica, x, y, 50, 100, "Torre mágica"));
 	        }
 	        if (nombre.equals("Iglesia")) {
 	        	miCiv.newChurch();
-	        	edificiosColocados.add(new EdificioColocado(imgIglesia, x, y, 160, 100));
+	        	edificiosColocados.add(new EdificioColocado(imgIglesia, x, y, 160, 100, "Iglesia"));
 	        }
 	    } catch (ResourceException ex) {
 	        JOptionPane.showMessageDialog(ventana, "Sin recursos suficientes para: " + nombre);
@@ -433,6 +434,46 @@ class PanelJuego extends JPanel implements ActionListener {
 		ventana.setLayout(new BorderLayout());
 		return ventana;
 	}
+	
+	private void cargarEdificiosGuardados() {
+	    String[][] datos = conexion.cargarEdificios(idCiv);
+	    for (String[] fila : datos) {
+	        String tipo = fila[0];
+	        int x = Integer.parseInt(fila[1]);
+	        int y = Integer.parseInt(fila[2]);
+
+	        Image img = null;
+	        int ancho = 100;
+	        int alto = 100;
+	        
+	        if (tipo.equals("Granja")) {
+	            img = imgGranja;
+	            ancho = 200;
+	            alto = 100;
+	        } else if (tipo.equals("Carpintería")) {
+	            img = imgCarpinteria;
+	            ancho = 180;
+	            alto = 80;
+	        } else if (tipo.equals("Herrería")) {
+	            img = imgHerreria;
+	            ancho = 120;
+	            alto = 120;
+	        } else if (tipo.equals("Torre mágica")) {
+	            img = imgTorre_magica;
+	            ancho = 50;
+	            alto = 100;
+	        } else if (tipo.equals("Iglesia")) {
+	            img = imgIglesia;
+	            ancho = 160;
+	            alto = 100;
+	        }
+
+	        if (img != null) {
+	            edificiosColocados.add(new EdificioColocado(img, x, y, ancho, alto, tipo));
+	        }
+	    }
+	    repaint();
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		try {
@@ -453,7 +494,8 @@ class PanelJuego extends JPanel implements ActionListener {
             }
 			if (e.getActionCommand().equals("Guardar Partida"))  {
 				conexion.guardarPartida(miCiv, idCiv, userID);
-				JOptionPane.showMessageDialog(this, "¡Partida guardada exitosamente!", "Guardado", JOptionPane.INFORMATION_MESSAGE);
+				conexion.guardarEdificios(idCiv, edificiosColocados);
+				JOptionPane.showMessageDialog(this, "¡Partida guardada!", "Guardado", JOptionPane.INFORMATION_MESSAGE);
             }
 			if (e.getActionCommand().equals("Cerrar sesión"))  {
 				int confirm = JOptionPane.showConfirmDialog(ventana, "¿Cerrar sesión y volver al menú principal?", "Cerrar sesión", JOptionPane.YES_NO_OPTION);

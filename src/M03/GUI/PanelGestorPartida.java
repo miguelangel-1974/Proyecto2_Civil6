@@ -73,10 +73,53 @@ class PanelGestorPartida extends JPanel implements Variables {
         });
 		
 		botonContinuarPartida.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(ventana, "Buscando partida guardada...");
-            }
-        });
+		    public void actionPerformed(ActionEvent e) {
+
+		        String[][] partidas = conexion.cargarPartidas(userID);
+
+		        if (partidas.length == 0) {
+		            JOptionPane.showMessageDialog(ventana, "No tienes ninguna partida guardada.", "Sin partidas", JOptionPane.INFORMATION_MESSAGE);
+		            return;
+		        }
+
+		        String[] opciones = new String[partidas.length];
+		        for (int i = 0; i < partidas.length; i++) {
+		            opciones[i] = partidas[i][1] + "  (id: " + partidas[i][0] + ")";
+		        }
+
+		        String seleccion = (String) JOptionPane.showInputDialog(
+		            ventana,
+		            "Selecciona la partida que quieres continuar:",
+		            "Continuar Partida",
+		            JOptionPane.PLAIN_MESSAGE,
+		            null, opciones, opciones[0]
+		        );
+
+		        if (seleccion == null) {
+		        	return;
+		        }
+		        
+		        int idxSel = 0;
+		        for (int i = 0; i < opciones.length; i++) {
+		            if (opciones[i].equals(seleccion)) { idxSel = i; break; }
+		        }
+		        int idCivSeleccionada = Integer.parseInt(partidas[idxSel][0]);
+
+		        Civilization civCargada = conexion.cargarCivilization(idCivSeleccionada);
+
+		        if (civCargada == null) {
+		            JOptionPane.showMessageDialog(ventana, "Error al cargar la partida.",
+		                "Error", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+
+		        Timer timerReloj = new Timer();
+                ResourceGenerator generador = new ResourceGenerator(civCargada);
+                timerReloj.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
+
+		        ventana.cambiarPanel(new PanelJuego(ventana, civCargada, conexion, idCivSeleccionada, userID));
+		    }
+		});
 		
 		add(Box.createVerticalGlue());
 		add(botonCrearPartida);
