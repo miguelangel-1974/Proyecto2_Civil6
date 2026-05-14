@@ -79,8 +79,6 @@ public class Battle implements Variables {
 		this.initInitialArmies();
 	}
 
-	// === GETTERS / SETTERS ===
-
 	public Civilization getCivilization() { return civilization; }
 	public void setCivilization(Civilization civilization) { this.civilization = civilization; }
 	public ArrayList<MilitaryUnit> getCivilizationArmy() { return civilizationArmy; }
@@ -110,8 +108,6 @@ public class Battle implements Variables {
 	public void setActualNumberUnitsCivilization(int[] actualNumberUnitsCivilization) { this.actualNumberUnitsCivilization = actualNumberUnitsCivilization; }
 	public int[] getActualNumberUnitsEnemy() { return actualNumberUnitsEnemy; }
 	public void setActualNumberUnitsEnemy(int[] actualNumberUnitsEnemy) { this.actualNumberUnitsEnemy = actualNumberUnitsEnemy; }
-
-	// === MÉTODOS AUXILIARES ===
 
 	public void initInitialArmies() {
 		this.initialArmies = new int[2][9];
@@ -193,8 +189,6 @@ public class Battle implements Variables {
 				+ this.resourcesLooses[1][0] / 10;
 	}
 
-	// === SELECCIÓN DE ATACANTE/DEFENSOR ===
-
 	public int getCivilizationGroupAttacker() {
 		int suma = 0;
 		for (int i = 0; i < 9; i++) {
@@ -255,11 +249,8 @@ public class Battle implements Variables {
 		return numGrupos - 1;
 	}
 
-	// === MECÁNICA DE BATALLA ===
-
 	public void pelear() {
 
-		// Pre-batalla: aplicar santificación si hay sacerdotes
 		if (this.actualNumberUnitsCivilization[8] > 0) {
 			for (int i = 0; i < this.civilizationArmy.size(); i++) {
 				MilitaryUnit u = this.civilizationArmy.get(i);
@@ -271,7 +262,6 @@ public class Battle implements Variables {
 			}
 		}
 
-		// Decidir quién empieza: 0 = civilización, 1 = enemigo (50/50)
 		int bandoAtacante;
 		if (Math.random() < 0.5) {
 			bandoAtacante = 0;
@@ -279,14 +269,12 @@ public class Battle implements Variables {
 			bandoAtacante = 1;
 		}
 
-		// Bucle principal: mientras ambos ejércitos tengan al menos 20% de sus unidades iniciales
 		while (this.remainderPercentageFleet(this.civilizationArmy) >= 20
 				&& this.remainderPercentageFleet(this.enemyArmy) >= 20) {
 
 			this.battleDevelopment = this.battleDevelopment
 					+ "********************CHANGE ATTACKER********************\n";
 
-			// Elegir grupo atacante
 			int grupoAtacante;
 			if (bandoAtacante == 0) {
 				grupoAtacante = this.getCivilizationGroupAttacker();
@@ -296,17 +284,14 @@ public class Battle implements Variables {
 
 			ArrayList<MilitaryUnit> grupoAt = this.armies.get(bandoAtacante).get(grupoAtacante);
 
-			// Si el grupo elegido está vacío, cambiar turno y volver
 			if (grupoAt.isEmpty()) {
 				bandoAtacante = 1 - bandoAtacante;
 				continue;
 			}
 
-			// Elegir unidad atacante al azar del grupo
 			int idxAtacante = (int) (Math.random() * grupoAt.size());
 			MilitaryUnit atacante = grupoAt.get(idxAtacante);
 
-			// Bucle interno: atacar y posiblemente repetir
 			boolean repite = true;
 			while (repite) {
 
@@ -351,13 +336,11 @@ public class Battle implements Variables {
 						+ nAtaque + " generates the damage = " + danyo + "\n"
 						+ nDef + " stays with armor = " + defensor.getActualArmor() + "\n";
 
-				// Si la unidad defensora ha sido eliminada
 				if (defensor.getActualArmor() <= 0) {
 
 					this.battleDevelopment = this.battleDevelopment
 							+ "we eliminate " + nDef + "\n";
 
-					// Tirar residuos
 					int chanceWaste = defensor.getChanceGeneratinWaste();
 					if ((int) (Math.random() * 100) < chanceWaste) {
 						this.wasteWoodIron[0] = this.wasteWoodIron[0]
@@ -366,18 +349,15 @@ public class Battle implements Variables {
 								+ defensor.getIronCost() * PERCENTATGE_WASTE / 100;
 					}
 
-					// Drops
 					if (bandoDefensor == 0) {
 						this.civilizationDrops = this.civilizationDrops + 1;
 					} else {
 						this.enemyDrops = this.enemyDrops + 1;
 					}
 
-					// Eliminar de grupoDef y del ejército plano
 					grupoDef.remove(idxDefensor);
 					ejercitoDefensor.remove(defensor);
 
-					// Decrementar contador actual
 					if (bandoDefensor == 0) {
 						this.actualNumberUnitsCivilization[grupoDefensor] =
 								this.actualNumberUnitsCivilization[grupoDefensor] - 1;
@@ -386,7 +366,6 @@ public class Battle implements Variables {
 								this.actualNumberUnitsEnemy[grupoDefensor] - 1;
 					}
 
-					// Si era un sacerdote de civilización y muere el último, desantificar
 					if (defensor instanceof Priest && bandoDefensor == 0
 							&& this.actualNumberUnitsCivilization[8] == 0) {
 						for (int k = 0; k < this.civilizationArmy.size(); k++) {
@@ -400,12 +379,10 @@ public class Battle implements Variables {
 					}
 				}
 
-				// Comprobar condición de fin antes de decidir si repite
 				if (this.remainderPercentageFleet(this.civilizationArmy) < 20
 						|| this.remainderPercentageFleet(this.enemyArmy) < 20) {
 					repite = false;
 				} else {
-					// ¿Repetir ataque?
 					if ((int) (Math.random() * 100) < atacante.getChanceAttackAgain()) {
 						repite = true;
 					} else {
@@ -414,13 +391,9 @@ public class Battle implements Variables {
 				}
 			}
 
-			// Cambiar turno
 			bandoAtacante = 1 - bandoAtacante;
 		}
 
-		// Post-batalla
-
-		// Experiencia +1 a supervivientes
 		for (int i = 0; i < this.civilizationArmy.size(); i++) {
 			MilitaryUnit u = this.civilizationArmy.get(i);
 			u.setExperience(u.getExperience() + 1);
@@ -430,13 +403,9 @@ public class Battle implements Variables {
 			u.setExperience(u.getExperience() + 1);
 		}
 
-		// Resetear armaduras del ejército civilización
 		this.resetArmyArmor();
-
-		// Actualizar pérdidas
 		this.updateResourcesLooses();
 
-		// Sincronizar civilization.getArmy(): eliminar muertas
 		for (int i = 0; i < 9; i++) {
 			ArrayList<MilitaryUnit> grupo = this.civilization.getArmy().get(i);
 			int j = 0;
@@ -450,7 +419,6 @@ public class Battle implements Variables {
 			}
 		}
 
-		// Decidir ganador y aplicar consecuencias
 		boolean ganaCiv;
 		if (this.resourcesLooses[0][3] <= this.resourcesLooses[1][3]) {
 			ganaCiv = true;
@@ -458,17 +426,13 @@ public class Battle implements Variables {
 			ganaCiv = false;
 		}
 
-		// Si gana civilización, recoge los residuos
 		if (ganaCiv) {
 			this.civilization.setWood(this.civilization.getWood() + this.wasteWoodIron[0]);
 			this.civilization.setIron(this.civilization.getIron() + this.wasteWoodIron[1]);
 		}
 
-		// Incrementar contador de batallas de la civilización
 		this.civilization.setBattles(this.civilization.getBattles() + 1);
 	}
-
-	// === REPORTES ===
 
 	public String getBattleReport(int battles) {
 		String r = "";
@@ -483,26 +447,31 @@ public class Battle implements Variables {
 			int unidadesCiv = this.actualNumberUnitsCivilization[i];
 			int dropsCiv = this.initialArmies[0][i] - unidadesCiv;
 
-			String linea = String.format("%-22s %5d %6d", nombres[i], unidadesCiv, dropsCiv);
+			String linea = padDerecha(nombres[i], 22)
+					+ " " + padIzquierda("" + unidadesCiv, 5)
+					+ " " + padIzquierda("" + dropsCiv, 6);
 
 			if (i < 4) {
 				int unidadesEn = this.actualNumberUnitsEnemy[i];
 				int dropsEn = this.initialArmies[1][i] - unidadesEn;
-				linea = linea + String.format("    %-22s %5d %6d", nombres[i], unidadesEn, dropsEn);
+				linea = linea + "    "
+						+ padDerecha(nombres[i], 22)
+						+ " " + padIzquierda("" + unidadesEn, 5)
+						+ " " + padIzquierda("" + dropsEn, 6);
 			}
 			r = r + linea + "\n";
 		}
 
 		r = r + "**************************************************************************************\n";
 		r = r + "Cost Army Civilization                 Cost Army Enemy\n";
-		r = r + String.format("Food:  %-30d Food:  %d%n", this.initialCostFleet[0][0], this.initialCostFleet[1][0]);
-		r = r + String.format("Wood:  %-30d Wood:  %d%n", this.initialCostFleet[0][1], this.initialCostFleet[1][1]);
-		r = r + String.format("Iron:  %-30d Iron:  %d%n", this.initialCostFleet[0][2], this.initialCostFleet[1][2]);
+		r = r + "Food:  " + padDerecha("" + this.initialCostFleet[0][0], 30) + " Food:  " + this.initialCostFleet[1][0] + "\n";
+		r = r + "Wood:  " + padDerecha("" + this.initialCostFleet[0][1], 30) + " Wood:  " + this.initialCostFleet[1][1] + "\n";
+		r = r + "Iron:  " + padDerecha("" + this.initialCostFleet[0][2], 30) + " Iron:  " + this.initialCostFleet[1][2] + "\n";
 		r = r + "**************************************************************************************\n";
 		r = r + "Losses Army Civilization               Losses Army Enemy\n";
-		r = r + String.format("Food:  %-30d Food:  %d%n", this.resourcesLooses[0][0], this.resourcesLooses[1][0]);
-		r = r + String.format("Wood:  %-30d Wood:  %d%n", this.resourcesLooses[0][1], this.resourcesLooses[1][1]);
-		r = r + String.format("Iron:  %-30d Iron:  %d%n", this.resourcesLooses[0][2], this.resourcesLooses[1][2]);
+		r = r + "Food:  " + padDerecha("" + this.resourcesLooses[0][0], 30) + " Food:  " + this.resourcesLooses[1][0] + "\n";
+		r = r + "Wood:  " + padDerecha("" + this.resourcesLooses[0][1], 30) + " Wood:  " + this.resourcesLooses[1][1] + "\n";
+		r = r + "Iron:  " + padDerecha("" + this.resourcesLooses[0][2], 30) + " Iron:  " + this.resourcesLooses[1][2] + "\n";
 		r = r + "**************************************************************************************\n";
 		r = r + "Waste Generated:\n";
 		r = r + "Wood  " + this.wasteWoodIron[0] + "\n";
@@ -523,7 +492,19 @@ public class Battle implements Variables {
 		return this.battleDevelopment;
 	}
 
-	// === HELPERS PRIVADOS ===
+	private String padDerecha(String s, int largo) {
+		while (s.length() < largo) {
+			s = s + " ";
+		}
+		return s;
+	}
+
+	private String padIzquierda(String s, int largo) {
+		while (s.length() < largo) {
+			s = " " + s;
+		}
+		return s;
+	}
 
 	private String nombreUnidad(MilitaryUnit u) {
 		if (u instanceof Swordsman) return "Swordsman";
