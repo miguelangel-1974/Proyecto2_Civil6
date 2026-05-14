@@ -1,0 +1,67 @@
+<div class="text-center py-16 mb-12 rounded-3xl relative overflow-hidden glass-panel">
+    <div class="relative z-10">
+        <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-6">Forja tu Imperio</h1>
+        <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto mb-8">
+            Gestiona recursos, desarrolla tecnologías y defiende tu civilización de constantes ataques enemigos.
+        </p>
+        <a href="/mi-ciudad" class="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-500 transition shadow-lg shadow-blue-500/30">
+            Acceder a mi Ciudad
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+    <div class="glass-panel p-6 rounded-2xl">
+        <h3 class="text-2xl font-serif text-amber-400 mb-4">Mecánica del Juego</h3>
+        <p class="text-slate-300 mb-4">Tu civilización genera <span class="text-green-400">Comida</span>, <span class="text-amber-700">Madera</span>, <span class="text-gray-400">Hierro</span> y <span class="text-purple-400">Maná</span>.
+        Úsalos sabiamente para construir granjas, herrerías y crear un ejército imparable.</p>
+        
+        <div class="mt-4 overflow-hidden rounded-xl shadow-lg border border-slate-700">
+            <img src="/img/pantalla_inicial.png" alt="Pantalla Inicial" class="w-full h-auto object-cover">
+        </div>
+    </div>
+    
+    <div class="glass-panel p-6 rounded-2xl">
+        <h3 class="text-2xl font-serif text-red-400 mb-4">La Amenaza Constante</h3>
+        <p class="text-slate-300 mb-4">Los enemigos no descansan.
+        Cada cierto tiempo recibirás ataques de tropas invasoras. Necesitarás torres de flechas, catapultas y una muralla sólida para resistir.</p>
+        
+        <div class="mt-4 overflow-hidden rounded-xl shadow-lg border border-slate-700">
+            <img src="/img/partida.png" alt="Partida en curso" class="w-full h-auto object-cover">
+        </div>
+    </div>
+</div>
+
+<h2 class="text-3xl font-serif font-bold text-blue-400 mb-6 border-b border-slate-700 pb-2">Partidas Actuales en el Servidor</h2>
+<div class="overflow-x-auto glass-panel rounded-xl mb-16">
+    <table class="w-full text-left border-collapse text-sm">
+        <thead>
+            <tr class="bg-slate-800 text-slate-300">
+                <th class="p-4 border-b border-slate-700">Comandante</th>
+                <th class="p-4 border-b border-slate-700">Civilización</th>
+                <th class="p-4 border-b border-slate-700">🍞 Comida</th>
+                <th class="p-4 border-b border-slate-700">🪵 Madera</th>
+                <th class="p-4 border-b border-slate-700">🪨 Hierro</th>
+                <th class="p-4 border-b border-slate-700">🔮 Maná</th>
+                <th class="p-4 border-b border-slate-700 text-red-400">⚔️ Batallas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#if partidas}}
+                {{#each partidas}}
+                <tr class="hover:bg-slate-800/50 transition">
+                    <td class="p-4 border-b border-slate-800 font-bold text-white">{{this.username}}</td>
+                    <td class="p-4 border-b border-slate-800">{{this.name}}</td>
+                    <td class="p-4 border-b border-slate-800 text-green-400">{{this.food_amount}}</td>
+                    <td class="p-4 border-b border-slate-800 text-amber-600">{{this.wood_amount}}</td>
+                    <td class="p-4 border-b border-slate-800 text-gray-400">{{this.iron_amount}}</td>
+                    <td class="p-4 border-b border-slate-800 text-purple-400">{{this.mana_amount}}</td>
+                    <td class="p-4 border-b border-slate-800 font-bold text-red-400">{{this.battles_counter}}</td>
+                </tr>
+                {{/each}}
+            {{else}}
+                <tr><td colspan="7" class="p-4 text-center text-slate-500">No hay partidas activas en este momento.</td></tr>
+            {{/if}}
+        </tbody>
+    </table>
+</div>
