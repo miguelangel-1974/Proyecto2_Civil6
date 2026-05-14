@@ -31,12 +31,19 @@ import javax.swing.border.EmptyBorder;
 
 import M03.BuildingException;
 import M03.Civilization;
+import M03.ConexionBD;
 import M03.ResourceException;
 
 class PanelJuego extends JPanel implements ActionListener {
  
 	private VentanaPrincipal ventana;
 	private Civilization miCiv;
+	
+	private ConexionBD conexion;
+	private int idCiv;
+	private int userID;
+	
+	
 	private Image fondoPartida;
 	private Image imgGranja, imgCarpinteria, imgHerreria, imgTorre_magica, imgIglesia;
  
@@ -46,13 +53,17 @@ class PanelJuego extends JPanel implements ActionListener {
 	private JLabel lblTorreLanza, lblCatapulta, lblTorreCohete;
 	private JLabel lblMago, lblSacerdote;
 	private JLabel lblGranjas, lblCarpinterias, lblHerrerias, lblTorresMagicas, lblIglesias;
+	private JLabel lblTecnoAtt, lblTecnoDef;
  
 	private String edificioEnCurso;
 	private ArrayList<EdificioColocado> edificiosColocados;
 	
-	public PanelJuego(VentanaPrincipal ventana, Civilization civ) {
+	public PanelJuego(VentanaPrincipal ventana, Civilization civ, ConexionBD conexion, int idCiv, int userID) {
 		this.ventana = ventana;
 		this.miCiv = civ;
+		this.conexion = conexion;
+		this.idCiv = idCiv;
+	    this.userID = userID;
  
 		edificiosColocados = new ArrayList<>();
 		
@@ -109,6 +120,8 @@ class PanelJuego extends JPanel implements ActionListener {
 		panel.add(Box.createVerticalStrut(15));
 		panel.add(crearBoton("Dar Items", Color.BLACK));
 		panel.add(Box.createVerticalGlue());
+		panel.add(crearBoton("Guardar Partida", Color.GREEN));
+		panel.add(Box.createVerticalStrut(15));
 		panel.add(crearBoton("Cerrar sesión", new Color(160, 30, 30)));
 		
 		return panel;
@@ -210,6 +223,28 @@ class PanelJuego extends JPanel implements ActionListener {
 		
 		panel.add(Box.createVerticalStrut(30));
 		
+		JLabel tituloEdificios = new JLabel("Edificios", JLabel.CENTER);
+		
+		tituloEdificios.setFont(new Font("Arial", Font.BOLD, 20));
+		tituloEdificios.setForeground(new Color(255, 210, 120));
+		
+		panel.add(tituloEdificios);
+		panel.add(Box.createVerticalStrut(6));
+
+		lblGranjas = estadoLabel("Granjas: 0", fontItem);
+		lblCarpinterias = estadoLabel("Carpinterías: 0", fontItem);
+		lblHerrerias = estadoLabel("Herrerías: 0", fontItem);
+		lblTorresMagicas = estadoLabel("Torres mágicas: 0", fontItem);
+		lblIglesias = estadoLabel("Iglesias: 0", fontItem);
+ 
+		panel.add(lblGranjas);
+		panel.add(lblCarpinterias);
+		panel.add(lblHerrerias);
+		panel.add(lblTorresMagicas);
+		panel.add(lblIglesias);
+		
+		panel.add(Box.createVerticalStrut(30));
+		
 		JLabel tituloUnidadesAtaque = new JLabel("Unidades Ataque", JLabel.CENTER);
 		
 		tituloUnidadesAtaque.setFont(new Font("Arial", Font.BOLD, 20));
@@ -248,7 +283,7 @@ class PanelJuego extends JPanel implements ActionListener {
 
 		panel.add(Box.createVerticalStrut(30));
 		
-		JLabel tituloUnidadesEspeciales = new JLabel("Unidades Especiales", JLabel.CENTER);
+		JLabel tituloUnidadesEspeciales = new JLabel("Unid. Especiales", JLabel.CENTER);
 		
 		tituloUnidadesEspeciales.setFont(new Font("Arial", Font.BOLD, 20));
 		tituloUnidadesEspeciales.setForeground(new Color(255, 210, 120));
@@ -261,27 +296,22 @@ class PanelJuego extends JPanel implements ActionListener {
 		
 		panel.add(lblMago);
 		panel.add(lblSacerdote);
+		
 		panel.add(Box.createVerticalStrut(30));
-
-		JLabel tituloEdificios = new JLabel("Edificios", JLabel.CENTER);
 		
-		tituloEdificios.setFont(new Font("Arial", Font.BOLD, 20));
-		tituloEdificios.setForeground(new Color(255, 210, 120));
+		JLabel tituloTecnologias = new JLabel("Tecnologías", JLabel.CENTER);
 		
-		panel.add(tituloEdificios);
+		tituloTecnologias.setFont(new Font("Arial", Font.BOLD, 20));
+		tituloTecnologias.setForeground(new Color(255, 210, 120));
+		
+		panel.add(tituloTecnologias);
 		panel.add(Box.createVerticalStrut(6));
 
-		lblGranjas = estadoLabel("Granjas: 0", fontItem);
-		lblCarpinterias = estadoLabel("Carpinterías: 0", fontItem);
-		lblHerrerias = estadoLabel("Herrerías: 0", fontItem);
-		lblTorresMagicas = estadoLabel("Torres mágicas: 0", fontItem);
-		lblIglesias = estadoLabel("Iglesias: 0", fontItem);
- 
-		panel.add(lblGranjas);
-		panel.add(lblCarpinterias);
-		panel.add(lblHerrerias);
-		panel.add(lblTorresMagicas);
-		panel.add(lblIglesias);
+		lblTecnoAtt = estadoLabel("Tecnologia Ataque: 0", fontItem);
+		lblTecnoDef = estadoLabel("Tecnologia Defensa: 0", fontItem);
+		
+		panel.add(lblTecnoAtt);
+		panel.add(lblTecnoDef);
  
 		return panel;
 	}
@@ -294,28 +324,31 @@ class PanelJuego extends JPanel implements ActionListener {
 	}
 
 	private void actualizarUI() {
-		lblComida.setText("Comida: "   + miCiv.getFood());
-		lblMadera.setText("Madera: "   + miCiv.getWood());
-		lblHierro.setText("Hierro: "   + miCiv.getIron());
-		lblMana.setText(  "Maná: "     + miCiv.getMana());
+		lblComida.setText("Comida: " + miCiv.getFood());
+		lblMadera.setText("Madera: " + miCiv.getWood());
+		lblHierro.setText("Hierro: " + miCiv.getIron());
+		lblMana.setText("Maná: " + miCiv.getMana());
 
-		lblEspadachin.setText("Espadachín: "  + miCiv.getArmy().get(0).size());
-		lblLancero.setText(   "Lancero: "     + miCiv.getArmy().get(1).size());
-		lblBallesta.setText(  "Ballesta: "    + miCiv.getArmy().get(2).size());
-		lblCanion.setText(    "Cañón: "       + miCiv.getArmy().get(3).size());
+		lblGranjas.setText("Granjas: " + miCiv.getFarm());
+		lblCarpinterias.setText("Carpinterías: " + miCiv.getCarpentry());
+		lblHerrerias.setText("Herrerías: " + miCiv.getSmithy());
+		lblTorresMagicas.setText("Torres mágicas: " + miCiv.getMagicTower());
+		lblIglesias.setText("Iglesias: " + miCiv.getChurch());
+		
+		lblEspadachin.setText("Espadachín: " + miCiv.getArmy().get(0).size());
+		lblLancero.setText("Lancero: " + miCiv.getArmy().get(1).size());
+		lblBallesta.setText("Ballesta: " + miCiv.getArmy().get(2).size());
+		lblCanion.setText("Cañón: " + miCiv.getArmy().get(3).size());
 
-		lblTorreLanza.setText( "Torre lanza: "  + miCiv.getArmy().get(4).size());
-		lblCatapulta.setText(  "Catapulta: "    + miCiv.getArmy().get(5).size());
+		lblTorreLanza.setText("Torre lanza: " + miCiv.getArmy().get(4).size());
+		lblCatapulta.setText("Catapulta: " + miCiv.getArmy().get(5).size());
 		lblTorreCohete.setText("Torre cohete: " + miCiv.getArmy().get(6).size());
  
-		lblMago.setText(      "Mago: "      + miCiv.getArmy().get(7).size());
-		lblSacerdote.setText( "Sacerdote: " + miCiv.getArmy().get(8).size());
-
-		lblGranjas.setText(       "Granjas: "        + miCiv.getFarm());
-		lblCarpinterias.setText(  "Carpinterías: "   + miCiv.getCarpentry());
-		lblHerrerias.setText(     "Herrerías: "       + miCiv.getSmithy());
-		lblTorresMagicas.setText( "Torres mágicas: " + miCiv.getMagicTower());
-		lblIglesias.setText(      "Iglesias: "        + miCiv.getChurch());
+		lblMago.setText("Mago: " + miCiv.getArmy().get(7).size());
+		lblSacerdote.setText("Sacerdote: " + miCiv.getArmy().get(8).size());
+		
+		lblTecnoAtt.setText("Tecnologia Ataque: " + miCiv.getTechnologyAtack());
+		lblTecnoDef.setText("Tecnologia Defensa: " + miCiv.getTechnologyDefense());
 		
 		repaint();
 	}
@@ -345,6 +378,7 @@ class PanelJuego extends JPanel implements ActionListener {
 		boolean esAtaque   = titulo.contains("Ataque");
 		boolean esDefensa  = titulo.contains("Defensa");
 		boolean esEspecial = titulo.contains("Especial");
+		boolean esTecnologia = titulo.contains("Tecnologías");
  
 		if (esAtaque) {
 			contenido.add(crearBotonConVentana("Espadachín",  Color.RED, ventana));
@@ -358,6 +392,9 @@ class PanelJuego extends JPanel implements ActionListener {
 		} else if (esEspecial) {
 			contenido.add(crearBotonConVentana("Mago", Color.PINK, ventana));
 			contenido.add(crearBotonConVentana("Sacerdote", Color.PINK, ventana));
+		} else if (esTecnologia) {
+			contenido.add(crearBotonConVentana("Mejorar Tecnologia Ataque", Color.RED, ventana));
+			contenido.add(crearBotonConVentana("Mejorar Tecnologia Defensa", Color.GREEN, ventana));
 		}
 
 		ventana.add(contenido);
@@ -412,7 +449,11 @@ class PanelJuego extends JPanel implements ActionListener {
 				abrirVentanaUnidades("Unidades Especiales");
             }
 			if (e.getActionCommand().equals("Tecnologías"))  {
-				JOptionPane.showMessageDialog(ventana, "Árbol de tecnologías — próximamente.");
+				abrirVentanaUnidades("Tecnologías");
+            }
+			if (e.getActionCommand().equals("Guardar Partida"))  {
+				conexion.guardarPartida(miCiv, idCiv, userID);
+				JOptionPane.showMessageDialog(this, "¡Partida guardada exitosamente!", "Guardado", JOptionPane.INFORMATION_MESSAGE);
             }
 			if (e.getActionCommand().equals("Cerrar sesión"))  {
 				int confirm = JOptionPane.showConfirmDialog(ventana, "¿Cerrar sesión y volver al menú principal?", "Cerrar sesión", JOptionPane.YES_NO_OPTION);
@@ -461,6 +502,13 @@ class PanelJuego extends JPanel implements ActionListener {
             }
             if (e.getActionCommand().equals("Sacerdote")) {
 				miCiv.newPriest(1);
+            }
+            
+            if (e.getActionCommand().equals("Mejorar Tecnologia Ataque")) {
+            	miCiv.upgradeTechnologyAttack();
+            }
+            if (e.getActionCommand().equals("Mejorar Tecnologia Defensa")) {
+            	miCiv.upgradeTechnologyDefense();
             }
             
             actualizarUI();

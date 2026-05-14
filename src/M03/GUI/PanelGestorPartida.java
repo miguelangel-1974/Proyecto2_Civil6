@@ -64,7 +64,7 @@ class PanelGestorPartida extends JPanel implements Variables {
                         ResourceGenerator generador = new ResourceGenerator(miCiv);
                         timerReloj.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
                         
-                        ventana.cambiarPanel(new PanelJuego(ventana, miCiv));
+                        ventana.cambiarPanel(new PanelJuego(ventana, miCiv, conexion, idCiv, userID));
                     } else {
                         JOptionPane.showMessageDialog(ventana, "Error al crear partida.");
                     }

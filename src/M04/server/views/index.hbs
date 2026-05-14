@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  {{> header}}
+  <link rel="stylesheet" href="/estils.css">
+  <title>Civilizations - Inici</title>
+</head>
+<body>
+  {{> menu}}
+
+  <main class="container">
+    <h1>Projecte Civilizations</h1>
+
+    <section class="cols-2">
+      <!-- Article d'informació del joc -->
+      <article class="card">
+        <h2>Sobre el Joc</h2>
+        <p>Domina el món gestionant la teva pròpia civilització. Conquereix territoris i gestiona els teus recursos amb saviesa.</p>
+        <div class="galeria">
+           <!-- Captura de pantalla del joc -->
+           <img src="/imatges/captura_joc.png" alt="Screenshot" style="width:100%; border-radius:8px;">
+        </div>
+      </article>
+
+      <!-- Taula amb les 2 últimes batalles -->
+      <article class="card">
+        <h2>Últimes 2 Batalles</h2>
+        <ul class="list">
+          {{#each ultimesBatalles}}
+            <li class="list-item">
+              <strong>Batalla #{{id_batalla}}</strong> - {{resultat}}<br>
+              <span class="muted">Data: {{data}}</span>
+              <a href="/informe?informe={{id_batalla}}" style="float:right">Veure informe</a>
+            </li>
+          {{/each}}
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  {{> footer}}
+</body>
+</html>

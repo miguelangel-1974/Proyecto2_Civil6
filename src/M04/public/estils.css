@@ -1,0 +1,51 @@
+/* Animació pel Logo */
+.logo-animat {
+    width: 80px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive */
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .navbar ul {
+        flex-direction: column;
+        text-align: center;
+    }
+    table {
+        font-size: 14px;
+    }
+}
+
+/* Estètica elegant */
+body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #444;
+    padding: 12px;
+    text-align: left;
+}
+
+tr:hover {
+    background-color: #333;
+    transition: 0.3s;
+}
