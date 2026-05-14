@@ -463,39 +463,40 @@ public class Civilization implements Variables{
 
 	public void newMagician(int n) throws ResourceException, BuildingException {
 
-    if (this.magicTower < 1) {
-        throw new BuildingException("No tienes Torres de mago para crear magos.");
-    }
-
-    int armor =0;
-    int damage =  0;
-
-    int creados = 0;
-
-    while (creados < n
-            && this.iron >= IRON_COST_MAGICIAN
-            && this.wood >= WOOD_COST_MAGICIAN
-            && this.food >= FOOD_COST_MAGICIAN
-            && this.mana >= MANA_COST_MAGICIAN) {
-
-        this.iron = this.iron - IRON_COST_MAGICIAN;
-        this.wood = this.wood - WOOD_COST_MAGICIAN;
-        this.food = this.food - FOOD_COST_MAGICIAN;
-        this.mana = this.mana - MANA_COST_MAGICIAN;
-
-        this.army.get(7).add(new Magician(armor, damage));
-
-        creados+=1;
-    }
-
-    if (creados > 0) {
-        System.out.println("Se han reclutado " + creados + " magos.");
-    }
-
-    if (creados < n) {
-        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
-    }
+	    if (this.magicTower < 1) {
+	        throw new BuildingException("No tienes Torres de mago para crear magos.");
+	    }
+	
+	    int armor = 0;
+	    int damage = 0;
+	
+	    int creados = 0;
+	
+	    while (creados < n
+	            && this.iron >= IRON_COST_MAGICIAN
+	            && this.wood >= WOOD_COST_MAGICIAN
+	            && this.food >= FOOD_COST_MAGICIAN
+	            && this.mana >= MANA_COST_MAGICIAN) {
+	
+	        this.iron = this.iron - IRON_COST_MAGICIAN;
+	        this.wood = this.wood - WOOD_COST_MAGICIAN;
+	        this.food = this.food - FOOD_COST_MAGICIAN;
+	        this.mana = this.mana - MANA_COST_MAGICIAN;
+	
+	        this.army.get(7).add(new Magician(armor, damage));
+	
+	        creados+=1;
+	    }
+	
+	    if (creados > 0) {
+	        System.out.println("Se han reclutado " + creados + " magos.");
+	    }
+	
+	    if (creados < n) {
+	        throw new ResourceException("Recursos insuficientes. Querias " + n + " magos, solo se crearon " + creados + ".");
+	    }
 	}
+	
 	public void newPriest(int n) throws ResourceException, BuildingException {
 		if (church<1) {
 			throw new BuildingException("No tienes Iglesias para crear sacerdotes");

@@ -25,16 +25,9 @@ import M03.ResourceGenerator;
 import M03.Variables;
 
 class PanelGestorPartida extends JPanel implements Variables {
-	private VentanaPrincipal ventana;
-	private ConexionBD conexion;
-	private int userID;
 	private Image logo;
 	
 	public PanelGestorPartida(VentanaPrincipal ventana, ConexionBD conexion, int userID) {
-		this.ventana = ventana;
-		this.conexion = conexion;
-		this.userID = userID;
-		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		try {
