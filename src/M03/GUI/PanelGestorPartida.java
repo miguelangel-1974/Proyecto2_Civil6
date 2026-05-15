@@ -60,10 +60,6 @@ class PanelGestorPartida extends JPanel implements Variables {
                     if (idCiv != -1) {
                         Civilization miCiv = new Civilization();
 
-                        Timer timerReloj = new Timer();
-                        ResourceGenerator generador = new ResourceGenerator(miCiv);
-                        timerReloj.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
-                        
                         ventana.cambiarPanel(new PanelJuego(ventana, miCiv, conexion, idCiv, userID));
                     } else {
                         JOptionPane.showMessageDialog(ventana, "Error al crear partida.");
@@ -112,10 +108,6 @@ class PanelGestorPartida extends JPanel implements Variables {
 		                "Error", JOptionPane.ERROR_MESSAGE);
 		            return;
 		        }
-
-		        Timer timerReloj = new Timer();
-                ResourceGenerator generador = new ResourceGenerator(civCargada);
-                timerReloj.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
 
 		        ventana.cambiarPanel(new PanelJuego(ventana, civCargada, conexion, idCivSeleccionada, userID));
 		    }
