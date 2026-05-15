@@ -26,10 +26,10 @@ public class Civilization implements Variables{
 		this.technologyDefense = 0;
 		this.technologyAtack = 0;
 
-		this.wood = 0;
-		this.iron = 0;
-		this.food = 0;
-		this.mana = 0;
+		this.wood = CIVILIZATION_WOOD_GENERATED;
+		this.iron = CIVILIZATION_IRON_GENERATED;
+		this.food = CIVILIZATION_FOOD_GENERATED;
+		this.mana = 100;
 
 		this.magicTower = 0;
 		this.church = 0;
