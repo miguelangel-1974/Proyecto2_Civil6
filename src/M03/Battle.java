@@ -272,9 +272,6 @@ public class Battle implements Variables {
 		while (this.remainderPercentageFleet(this.civilizationArmy) >= 20
 				&& this.remainderPercentageFleet(this.enemyArmy) >= 20) {
 
-			this.battleDevelopment = this.battleDevelopment
-					+ "********************CHANGE ATTACKER********************\n";
-
 			int grupoAtacante;
 			if (bandoAtacante == 0) {
 				grupoAtacante = this.getCivilizationGroupAttacker();
@@ -285,9 +282,11 @@ public class Battle implements Variables {
 			ArrayList<MilitaryUnit> grupoAt = this.armies.get(bandoAtacante).get(grupoAtacante);
 
 			if (grupoAt.isEmpty()) {
-				bandoAtacante = 1 - bandoAtacante;
 				continue;
 			}
+
+			this.battleDevelopment = this.battleDevelopment
+					+ "********************CHANGE ATTACKER********************\n";
 
 			int idxAtacante = (int) (Math.random() * grupoAt.size());
 			MilitaryUnit atacante = grupoAt.get(idxAtacante);
