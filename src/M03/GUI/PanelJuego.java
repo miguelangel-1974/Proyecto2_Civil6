@@ -126,7 +126,7 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 		timer.scheduleAtFixedRate(new TimerTask() {
 	        public void run() {
 	            JOptionPane.showMessageDialog(PanelJuego.this,
-	                "¡Se acerca un ejército enemigo!\nPrepara tus tropas.",
+	                "¡Se acerca un ejército enemigo!",
 	                "Va a comenzar una batalla",
 	                JOptionPane.WARNING_MESSAGE);
 
@@ -136,20 +136,32 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	            Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
 	            generarEnemigos.viewThreat();
 	            batalla.pelear();
+	            
+	            conexion.guardarBatalla(batalla, idCiv);
+	            
 	            String reporte = batalla.getBattleReport(miCiv.getBattles());
-
+	            String battleDevelopment = batalla.getBattleDevelopment();
+	            
+	            String contenido = "========== DESARROLLO DE LA BATALLA (LOG) ==========\n\n" 
+                        + battleDevelopment 
+                        + "\n\n"
+                        + "========== RESUMEN FINAL Y ESTADÍSTICAS ==========\n\n" 
+                        + reporte;
+	            
 	            JFrame ventanaBatalla = new JFrame("Resultado de la Batalla");
-	            ventanaBatalla.setSize(500, 400);
+	            ventanaBatalla.setSize(750, 650);
 	            ventanaBatalla.setLocationRelativeTo(PanelJuego.this);
 	            ventanaBatalla.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-	            JTextArea textArea = new JTextArea(reporte);
+	            JTextArea textArea = new JTextArea(contenido);
 	            textArea.setEditable(false);
 	            textArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
 	            textArea.setBackground(new Color(20, 20, 20));
 	            textArea.setForeground(new Color(200, 255, 200));
-	            textArea.setMargin(new Insets(10, 10, 10, 10));
+	            textArea.setMargin(new Insets(15, 15, 15, 15));
 
+	            textArea.setCaretPosition(0);
+	            
 	            ventanaBatalla.add(new JScrollPane(textArea));
 
 	            ventanaBatalla.addWindowListener(new WindowAdapter() {
@@ -231,28 +243,28 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 
 	private void colocarEdificio(String nombre, int x, int y) {
 	    try {
-	        if (nombre.equals("Granja")) {
-	        	miCiv.newFarm();
-	        	edificiosColocados.add(new EdificioColocado(imgGranja, x, y, 200, 100, "Granja"));
+	        if (nombre.equals("Granja | C: "+FOOD_COST_FARM+" | M: "+WOOD_COST_FARM+" | H: "+IRON_COST_FARM)) {
+	            miCiv.newFarm();
+	            edificiosColocados.add(new EdificioColocado(imgGranja, x, y, 200, 100, "Granja"));
 	        }
-	        if (nombre.equals("Carpintería")) {
-	        	miCiv.newCarpentry();
-	        	edificiosColocados.add(new EdificioColocado(imgCarpinteria, x, y, 180, 80, "Carpintería"));
+	        else if (nombre.equals("Carpintería | C: "+FOOD_COST_CARPENTRY+" | M: "+WOOD_COST_CARPENTRY+" | H: "+IRON_COST_CARPENTRY)) {
+	            miCiv.newCarpentry();
+	            edificiosColocados.add(new EdificioColocado(imgCarpinteria, x, y, 180, 80, "Carpintería"));
 	        }
-	        if (nombre.equals("Herrería")) {
-	        	miCiv.newSmithy();
-	        	edificiosColocados.add(new EdificioColocado(imgHerreria, x, y, 120, 120, "Herrería"));
+	        else if (nombre.equals("Herrería | C: "+FOOD_COST_SMITHY+" | M: "+WOOD_COST_SMITHY+" | H: "+IRON_COST_SMITHY)) {
+	            miCiv.newSmithy();
+	            edificiosColocados.add(new EdificioColocado(imgHerreria, x, y, 120, 120, "Herrería"));
 	        }
-	        if (nombre.equals("Torre mágica")) {
-	        	miCiv.newMagicTower();
-	        	edificiosColocados.add(new EdificioColocado(imgTorre_magica, x, y, 50, 100, "Torre mágica"));
+	        else if (nombre.equals("Torre mágica | C: "+FOOD_COST_MAGICTOWER+" | M: "+WOOD_COST_MAGICTOWER+" | H: "+IRON_COST_MAGICTOWER)) {
+	            miCiv.newMagicTower();
+	            edificiosColocados.add(new EdificioColocado(imgTorre_magica, x, y, 50, 100, "Torre mágica"));
 	        }
-	        if (nombre.equals("Iglesia")) {
-	        	miCiv.newChurch();
-	        	edificiosColocados.add(new EdificioColocado(imgIglesia, x, y, 160, 100, "Iglesia"));
+	        else if (nombre.equals("Iglesia | C: "+FOOD_COST_CHURCH+" | M: "+WOOD_COST_CHURCH+" | H: "+IRON_COST_CHURCH+" | Mana: "+MANA_COST_CHURCH)) {
+	            miCiv.newChurch();
+	            edificiosColocados.add(new EdificioColocado(imgIglesia, x, y, 160, 100, "Iglesia"));
 	        }
 	    } catch (ResourceException ex) {
-	        JOptionPane.showMessageDialog(ventana, "Sin recursos suficientes para: " + nombre);
+	        JOptionPane.showMessageDialog(ventana, "Sin recursos suficientes.");
 	    } finally {
 	        edificioEnCurso = null;
 	        setCursor(Cursor.getDefaultCursor());
@@ -421,27 +433,29 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 		lblTecnoAtt.setText("Tecnologia Ataque: " + miCiv.getTechnologyAtack());
 		lblTecnoDef.setText("Tecnologia Defensa: " + miCiv.getTechnologyDefense());
 		
+		lblBatallas.setText("Batallas: " + miCiv.getBattles());
+		
 		repaint();
 	}
 
 	private void abrirVentanaEdificios() {
-		JFrame ventana = ventanaSecundaria("Construcción de Edificios", 400, 300);
-		JPanel contenido = new JPanel(new GridLayout(0, 1, 4, 4));
-		contenido.setBackground(new Color(40, 40, 40));
-		contenido.setBorder(new EmptyBorder(12, 12, 12, 12));
- 
-		contenido.add(crearBotonConVentana("Granja", new Color(30, 100, 50), ventana));
-		contenido.add(crearBotonConVentana("Carpintería", new Color(30, 100, 50), ventana));
-		contenido.add(crearBotonConVentana("Herrería", new Color(30, 100, 50), ventana));
-		contenido.add(crearBotonConVentana("Torre mágica", new Color(30, 100, 50), ventana));
-		contenido.add(crearBotonConVentana("Iglesia", new Color(30, 100, 50), ventana));
- 
-		ventana.add(contenido);
-		ventana.setVisible(true);
+	    JFrame ventana = ventanaSecundaria("Construcción de Edificios", 520, 420);
+	    JPanel contenido = new JPanel(new GridLayout(0, 1, 4, 4));
+	    contenido.setBackground(new Color(40, 40, 40));
+	    contenido.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+	    contenido.add(crearBotonConVentana("Granja | C: "+FOOD_COST_FARM+" | M: "+WOOD_COST_FARM+" | H: "+IRON_COST_FARM, new Color(30, 100, 50), ventana));
+	    contenido.add(crearBotonConVentana("Carpintería | C: "+FOOD_COST_CARPENTRY+" | M: "+WOOD_COST_CARPENTRY+" | H: "+IRON_COST_CARPENTRY, new Color(30, 100, 50), ventana));
+	    contenido.add(crearBotonConVentana("Herrería | C: "+FOOD_COST_SMITHY+" | M: "+WOOD_COST_SMITHY+" | H: "+IRON_COST_SMITHY, new Color(30, 100, 50), ventana));
+	    contenido.add(crearBotonConVentana("Torre mágica | C: "+FOOD_COST_MAGICTOWER+" | M: "+WOOD_COST_MAGICTOWER+" | H: "+IRON_COST_MAGICTOWER, new Color(30, 100, 50), ventana));
+	    contenido.add(crearBotonConVentana("Iglesia | C: "+FOOD_COST_CHURCH+" | M: "+WOOD_COST_CHURCH+" | H: "+IRON_COST_CHURCH+" | Mana: "+MANA_COST_CHURCH, new Color(30, 100, 50), ventana));
+
+	    ventana.add(contenido);
+	    ventana.setVisible(true);
 	}
 	
 	private void abrirVentanaUnidades(String titulo) {
-		JFrame ventana = ventanaSecundaria(titulo, 420, 320);
+		JFrame ventana = ventanaSecundaria(titulo, 520, 420);
 		JPanel contenido = new JPanel(new GridLayout(0, 1, 4, 4));
 		contenido.setBackground(new Color(40, 40, 40));
 		contenido.setBorder(new EmptyBorder(12, 12, 12, 12));
@@ -452,20 +466,20 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 		boolean esTecnologia = titulo.contains("Tecnologías");
  
 		if (esAtaque) {
-			contenido.add(crearBotonConVentana("Espadachín",  Color.RED, ventana));
-			contenido.add(crearBotonConVentana("Lancero", Color.RED, ventana));
-			contenido.add(crearBotonConVentana("Ballesta", Color.RED, ventana));
-			contenido.add(crearBotonConVentana("Cañón", Color.RED, ventana));
+		    contenido.add(crearBotonConVentana("Espadachín | C: "+FOOD_COST_SWORDSMAN+" | M: "+WOOD_COST_SWORDSMAN+" | H: "+IRON_COST_SWORDSMAN, Color.RED, ventana));
+		    contenido.add(crearBotonConVentana("Lancero | C: "+FOOD_COST_SPEARMAN+" | M: "+WOOD_COST_SPEARMAN+" | H: "+IRON_COST_SPEARMAN, Color.RED, ventana));
+		    contenido.add(crearBotonConVentana("Ballesta | M: "+WOOD_COST_CROSSBOW+" | H: "+IRON_COST_CROSSBOW, Color.RED, ventana));
+		    contenido.add(crearBotonConVentana("Cañón | M: "+WOOD_COST_CANNON+" | H: "+IRON_COST_CANNON, Color.RED, ventana));
 		} else if (esDefensa) {
-			contenido.add(crearBotonConVentana("Torre lanza", Color.BLUE, ventana));
-			contenido.add(crearBotonConVentana("Catapulta", Color.BLUE, ventana));
-			contenido.add(crearBotonConVentana("Torre cohete", Color.BLUE, ventana));
+		    contenido.add(crearBotonConVentana("Torre lanza | M: "+WOOD_COST_ARROWTOWER, Color.BLUE, ventana));
+		    contenido.add(crearBotonConVentana("Catapulta | M: "+WOOD_COST_CATAPULT+" | H: "+IRON_COST_CATAPULT, Color.BLUE, ventana));
+		    contenido.add(crearBotonConVentana("Torre cohete | M: "+WOOD_COST_ROCKETLAUNCHERTOWER+" | H: "+IRON_COST_ROCKETLAUNCHERTOWER, Color.BLUE, ventana));
 		} else if (esEspecial) {
-			contenido.add(crearBotonConVentana("Mago", Color.PINK, ventana));
-			contenido.add(crearBotonConVentana("Sacerdote", Color.PINK, ventana));
+		    contenido.add(crearBotonConVentana("Mago | C: "+FOOD_COST_MAGICIAN+" | M: "+WOOD_COST_MAGICIAN+" | H: "+IRON_COST_MAGICIAN+" | Mana: "+MANA_COST_MAGICIAN, Color.PINK, ventana));
+		    contenido.add(crearBotonConVentana("Sacerdote | C: "+FOOD_COST_PRIEST+" | Mana: "+MANA_COST_PRIEST, Color.PINK, ventana));
 		} else if (esTecnologia) {
-			contenido.add(crearBotonConVentana("Mejorar Tecnologia Ataque", Color.RED, ventana));
-			contenido.add(crearBotonConVentana("Mejorar Tecnologia Defensa", Color.GREEN, ventana));
+		    contenido.add(crearBotonConVentana("Mejorar Tecnologia Ataque | H: "+UPGRADE_BASE_ATTACK_TECHNOLOGY_IRON_COST, Color.RED, ventana));
+		    contenido.add(crearBotonConVentana("Mejorar Tecnologia Defensa | H: "+UPGRADE_BASE_DEFENSE_TECHNOLOGY_IRON_COST, Color.GREEN, ventana));
 		}
 
 		ventana.add(contenido);
@@ -588,11 +602,15 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
             }
 			
 			
-            if (e.getActionCommand().equals("Granja") || e.getActionCommand().equals("Carpintería") || e.getActionCommand().equals("Herrería") || 
-            		e.getActionCommand().equals("Torre mágica") || e.getActionCommand().equals("Iglesia"))  {
-            	edificioEnCurso = e.getActionCommand();
-            	setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-            }
+			if (e.getActionCommand().equals("Granja | C: "+FOOD_COST_FARM+" | M: "+WOOD_COST_FARM+" | H: "+IRON_COST_FARM) || 
+				    e.getActionCommand().equals("Carpintería | C: "+FOOD_COST_CARPENTRY+" | M: "+WOOD_COST_CARPENTRY+" | H: "+IRON_COST_CARPENTRY) || 
+				    e.getActionCommand().equals("Herrería | C: "+FOOD_COST_SMITHY+" | M: "+WOOD_COST_SMITHY+" | H: "+IRON_COST_SMITHY) || 
+				    e.getActionCommand().equals("Torre mágica | C: "+FOOD_COST_MAGICTOWER+" | M: "+WOOD_COST_MAGICTOWER+" | H: "+IRON_COST_MAGICTOWER) || 
+				    e.getActionCommand().equals("Iglesia | C: "+FOOD_COST_CHURCH+" | M: "+WOOD_COST_CHURCH+" | H: "+IRON_COST_CHURCH+" | Mana: "+MANA_COST_CHURCH)) {
+				    
+				    edificioEnCurso = e.getActionCommand();
+				    setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				}
 
             if (e.getActionCommand().equals("Dar Items"))  {
             	miCiv.setFood(miCiv.getFood()+1000000);
@@ -601,48 +619,54 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
         		miCiv.setIron(miCiv.getIron()+1000000);
             }
             
-            if (e.getActionCommand().equals("Espadachín")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newSwordsman(cantidad);
+            // --- UNIDADES DE ATAQUE ---
+            if (e.getActionCommand().equals("Espadachín | C: "+FOOD_COST_SWORDSMAN+" | M: "+WOOD_COST_SWORDSMAN+" | H: "+IRON_COST_SWORDSMAN)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newSwordsman(cantidad);
             }
-            if (e.getActionCommand().equals("Lancero")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newSpearman(cantidad);
+            else if (e.getActionCommand().equals("Lancero | C: "+FOOD_COST_SPEARMAN+" | M: "+WOOD_COST_SPEARMAN+" | H: "+IRON_COST_SPEARMAN)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newSpearman(cantidad);
             }
-            if (e.getActionCommand().equals("Ballesta")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newCrossbow(cantidad);
+            else if (e.getActionCommand().equals("Ballesta | M: "+WOOD_COST_CROSSBOW+" | H: "+IRON_COST_CROSSBOW)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newCrossbow(cantidad);
             }
-            if (e.getActionCommand().equals("Cañón")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newCannon(cantidad);
+            else if (e.getActionCommand().equals("Cañón | M: "+WOOD_COST_CANNON+" | H: "+IRON_COST_CANNON)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newCannon(cantidad);
             }
-            if (e.getActionCommand().equals("Torre lanza")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newArrowTower(cantidad);
+
+            // --- UNIDADES DE DEFENSA ---
+            else if (e.getActionCommand().equals("Torre lanza | M: "+WOOD_COST_ARROWTOWER)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newArrowTower(cantidad);
             }
-            if (e.getActionCommand().equals("Catapulta")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newCatapult(cantidad);
+            else if (e.getActionCommand().equals("Catapulta | M: "+WOOD_COST_CATAPULT+" | H: "+IRON_COST_CATAPULT)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newCatapult(cantidad);
             }
-            if (e.getActionCommand().equals("Torre cohete")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newRocketLauncher(cantidad);
+            else if (e.getActionCommand().equals("Torre cohete | M: "+WOOD_COST_ROCKETLAUNCHERTOWER+" | H: "+IRON_COST_ROCKETLAUNCHERTOWER)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newRocketLauncher(cantidad);
             }
-            if (e.getActionCommand().equals("Mago")) {
-            	int cantidad = comprarUnidadesCantidad();
-            	miCiv.newMagician(cantidad);
+
+            // --- UNIDADES ESPECIALES ---
+            else if (e.getActionCommand().equals("Mago | C: "+FOOD_COST_MAGICIAN+" | M: "+WOOD_COST_MAGICIAN+" | H: "+IRON_COST_MAGICIAN+" | Mana: "+MANA_COST_MAGICIAN)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newMagician(cantidad);
             }
-            if (e.getActionCommand().equals("Sacerdote")) {
-            	int cantidad = comprarUnidadesCantidad();
-				miCiv.newPriest(cantidad);
+            else if (e.getActionCommand().equals("Sacerdote | C: "+FOOD_COST_PRIEST+" | Mana: "+MANA_COST_PRIEST)) {
+                int cantidad = comprarUnidadesCantidad();
+                miCiv.newPriest(cantidad);
             }
-            
-            if (e.getActionCommand().equals("Mejorar Tecnologia Ataque")) {
-            	miCiv.upgradeTechnologyAttack();
+
+            // --- TECNOLOGÍA ---
+            else if (e.getActionCommand().equals("Mejorar Tecnologia Ataque | H: "+UPGRADE_BASE_ATTACK_TECHNOLOGY_IRON_COST)) {
+                miCiv.upgradeTechnologyAttack();
             }
-            if (e.getActionCommand().equals("Mejorar Tecnologia Defensa")) {
-            	miCiv.upgradeTechnologyDefense();
+            else if (e.getActionCommand().equals("Mejorar Tecnologia Defensa | H: "+UPGRADE_BASE_DEFENSE_TECHNOLOGY_IRON_COST)) {
+                miCiv.upgradeTechnologyDefense();
             }
             
             actualizarUI();
