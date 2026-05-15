@@ -9,10 +9,13 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +30,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import M03.Battle;
@@ -63,7 +68,8 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	
 	private ResourceGenerator generador;
 	private EnemyArmyGenerator generarEnemigos;
-	
+
+	private Timer timer;
 	
 	public PanelJuego(VentanaPrincipal ventana, Civilization civ, ConexionBD conexion, int idCiv, int userID) {
 		this.ventana = ventana;
@@ -100,32 +106,62 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	}
 
 	private void comenzarTimers() {
-		Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-        	public void run() {
-        		actualizarUI();
-        	}
-        };
-        TimerTask guardarPartidaAutomatico = new TimerTask() {
-        	public void run() {
-        		conexion.guardarPartida(miCiv, idCiv, userID);
-				conexion.guardarEdificios(idCiv, edificiosColocados);
-        		System.out.println("Se ha guardado la partida");
-        	}
-        };
-        TimerTask batallaAutomatica = new TimerTask() {
-        	public void run() {
-        		generarEnemigos.createEnemyArmy();
-        		Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
-        		generarEnemigos.viewThreat();
-        		batalla.pelear();
-        		System.out.println(batalla.getBattleReport(miCiv.getBattles()));
-        	}
-        };
-        timer.scheduleAtFixedRate(task, 0, 50);
-        timer.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
-        timer.scheduleAtFixedRate(guardarPartidaAutomatico, AUTO_SAVE_TIME, AUTO_SAVE_TIME);
-        timer.scheduleAtFixedRate(batallaAutomatica, AUTO_GENERATE_BATTLE, AUTO_GENERATE_BATTLE);
+		timer = new Timer();
+		
+		timer.scheduleAtFixedRate(new TimerTask() {
+	        public void run() { 
+	        	actualizarUI();
+	        }
+	    }, 0, 50);
+		
+		timer.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
+		
+		timer.scheduleAtFixedRate(new TimerTask() {
+	        public void run() {
+	            conexion.guardarPartida(miCiv, idCiv, userID);
+	            conexion.guardarEdificios(idCiv, edificiosColocados);
+	        }
+	    }, AUTO_SAVE_TIME, AUTO_SAVE_TIME);
+		
+		timer.scheduleAtFixedRate(new TimerTask() {
+	        public void run() {
+	            JOptionPane.showMessageDialog(PanelJuego.this,
+	                "¡Se acerca un ejército enemigo!\nPrepara tus tropas.",
+	                "Va a comenzar una batalla",
+	                JOptionPane.WARNING_MESSAGE);
+
+	            timer.cancel();
+
+	            generarEnemigos.createEnemyArmy();
+	            Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
+	            generarEnemigos.viewThreat();
+	            batalla.pelear();
+	            String reporte = batalla.getBattleReport(miCiv.getBattles());
+
+	            JFrame ventanaBatalla = new JFrame("Resultado de la Batalla");
+	            ventanaBatalla.setSize(500, 400);
+	            ventanaBatalla.setLocationRelativeTo(PanelJuego.this);
+	            ventanaBatalla.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+	            JTextArea textArea = new JTextArea(reporte);
+	            textArea.setEditable(false);
+	            textArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
+	            textArea.setBackground(new Color(20, 20, 20));
+	            textArea.setForeground(new Color(200, 255, 200));
+	            textArea.setMargin(new Insets(10, 10, 10, 10));
+
+	            ventanaBatalla.add(new JScrollPane(textArea));
+
+	            ventanaBatalla.addWindowListener(new WindowAdapter() {
+	                public void windowClosed(WindowEvent we) {
+	                    generador = new ResourceGenerator(miCiv);
+	                    comenzarTimers();
+	                }
+	            });
+
+	            ventanaBatalla.setVisible(true);
+	        }
+	    }, AUTO_GENERATE_BATTLE, AUTO_GENERATE_BATTLE);
 	}
 	
 	private JPanel crearPanelAcciones() {
@@ -508,7 +544,20 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	    }
 	    repaint();
 	}
-
+	
+	public int comprarUnidadesCantidad() {
+		String cantidad = JOptionPane.showInputDialog(ventana,"Cuantos quieres adquirir?");
+		
+		if (cantidad != null) {
+			try { 
+				return Integer.parseInt(cantidad);
+			} catch (NumberFormatException e) {
+				return 0;
+			}
+		}
+		return 0;
+	}
+ 
 	public void actionPerformed(ActionEvent e) {
 		try {
 			if (e.getActionCommand().equals("Edificios"))  {
@@ -553,31 +602,40 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
             }
             
             if (e.getActionCommand().equals("Espadachín")) {
-            	miCiv.newSwordsman(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newSwordsman(cantidad);
             }
             if (e.getActionCommand().equals("Lancero")) {
-            	miCiv.newSpearman(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newSpearman(cantidad);
             }
             if (e.getActionCommand().equals("Ballesta")) {
-            	miCiv.newCrossbow(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newCrossbow(cantidad);
             }
             if (e.getActionCommand().equals("Cañón")) {
-            	miCiv.newCannon(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newCannon(cantidad);
             }
             if (e.getActionCommand().equals("Torre lanza")) {
-            	miCiv.newArrowTower(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newArrowTower(cantidad);
             }
             if (e.getActionCommand().equals("Catapulta")) {
-            	miCiv.newCatapult(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newCatapult(cantidad);
             }
             if (e.getActionCommand().equals("Torre cohete")) {
-            	miCiv.newRocketLauncher(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newRocketLauncher(cantidad);
             }
             if (e.getActionCommand().equals("Mago")) {
-            	miCiv.newMagician(10);
+            	int cantidad = comprarUnidadesCantidad();
+            	miCiv.newMagician(cantidad);
             }
             if (e.getActionCommand().equals("Sacerdote")) {
-				miCiv.newPriest(10);
+            	int cantidad = comprarUnidadesCantidad();
+				miCiv.newPriest(cantidad);
             }
             
             if (e.getActionCommand().equals("Mejorar Tecnologia Ataque")) {
