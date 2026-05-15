@@ -29,12 +29,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import M03.Battle;
 import M03.BuildingException;
 import M03.Civilization;
 import M03.ConexionBD;
+import M03.EnemyArmyGenerator;
 import M03.ResourceException;
+import M03.ResourceGenerator;
+import M03.Variables;
 
-class PanelJuego extends JPanel implements ActionListener {
+class PanelJuego extends JPanel implements ActionListener, Variables {
  
 	private VentanaPrincipal ventana;
 	private Civilization miCiv;
@@ -57,6 +61,10 @@ class PanelJuego extends JPanel implements ActionListener {
 	private String edificioEnCurso;
 	private ArrayList<EdificioColocado> edificiosColocados;
 	
+	private ResourceGenerator generador;
+	private EnemyArmyGenerator generarEnemigos;
+	
+	
 	public PanelJuego(VentanaPrincipal ventana, Civilization civ, ConexionBD conexion, int idCiv, int userID) {
 		this.ventana = ventana;
 		this.miCiv = civ;
@@ -65,6 +73,9 @@ class PanelJuego extends JPanel implements ActionListener {
 	    this.userID = userID;
  
 		edificiosColocados = new ArrayList<>();
+		
+		generador = new ResourceGenerator(miCiv);
+		generarEnemigos = new EnemyArmyGenerator(miCiv);
 		
 		setLayout(new BorderLayout());
 
@@ -83,17 +94,40 @@ class PanelJuego extends JPanel implements ActionListener {
 		add(crearZonaCentral(), BorderLayout.CENTER);
 		add(crearPanelEstado(), BorderLayout.EAST);
  
+        cargarEdificiosGuardados();
+        
+        comenzarTimers();
+	}
+
+	private void comenzarTimers() {
 		Timer timer = new Timer();
         TimerTask task = new TimerTask() {
         	public void run() {
         		actualizarUI();
         	}
         };
+        TimerTask guardarPartidaAutomatico = new TimerTask() {
+        	public void run() {
+        		conexion.guardarPartida(miCiv, idCiv, userID);
+				conexion.guardarEdificios(idCiv, edificiosColocados);
+        		System.out.println("Se ha guardado la partida");
+        	}
+        };
+        TimerTask batallaAutomatica = new TimerTask() {
+        	public void run() {
+        		generarEnemigos.createEnemyArmy();
+        		Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
+        		generarEnemigos.viewThreat();
+        		batalla.pelear();
+        		System.out.println(batalla.getBattleReport(miCiv.getBattles()));
+        	}
+        };
         timer.scheduleAtFixedRate(task, 0, 50);
-        
-        cargarEdificiosGuardados();
+        timer.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
+        timer.scheduleAtFixedRate(guardarPartidaAutomatico, AUTO_SAVE_TIME, AUTO_SAVE_TIME);
+        timer.scheduleAtFixedRate(batallaAutomatica, AUTO_GENERATE_BATTLE, AUTO_GENERATE_BATTLE);
 	}
-
+	
 	private JPanel crearPanelAcciones() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -519,31 +553,31 @@ class PanelJuego extends JPanel implements ActionListener {
             }
             
             if (e.getActionCommand().equals("Espadachín")) {
-            	miCiv.newSwordsman(1);
+            	miCiv.newSwordsman(10);
             }
             if (e.getActionCommand().equals("Lancero")) {
-            	miCiv.newSpearman(1);
+            	miCiv.newSpearman(10);
             }
             if (e.getActionCommand().equals("Ballesta")) {
-            	miCiv.newCrossbow(1);
+            	miCiv.newCrossbow(10);
             }
             if (e.getActionCommand().equals("Cañón")) {
-            	miCiv.newCannon(1);
+            	miCiv.newCannon(10);
             }
             if (e.getActionCommand().equals("Torre lanza")) {
-            	miCiv.newArrowTower(1);
+            	miCiv.newArrowTower(10);
             }
             if (e.getActionCommand().equals("Catapulta")) {
-            	miCiv.newCatapult(1);
+            	miCiv.newCatapult(10);
             }
             if (e.getActionCommand().equals("Torre cohete")) {
-            	miCiv.newRocketLauncher(1);
+            	miCiv.newRocketLauncher(10);
             }
             if (e.getActionCommand().equals("Mago")) {
-            	miCiv.newMagician(1);
+            	miCiv.newMagician(10);
             }
             if (e.getActionCommand().equals("Sacerdote")) {
-				miCiv.newPriest(1);
+				miCiv.newPriest(10);
             }
             
             if (e.getActionCommand().equals("Mejorar Tecnologia Ataque")) {
