@@ -7,9 +7,9 @@ public interface Variables {
 	public final int AUTO_GENERATE_BATTLE = 180000;
 
 	// resources available to create the first enemy fleet
-	public final int IRON_BASE_ENEMY_ARMY = 13000;
-	public final int WOOD_BASE_ENEMY_ARMY = 90000;
-	public final int FOOD_BASE_ENEMY_ARMY = 35000;
+	public final int IRON_BASE_ENEMY_ARMY = 4000;
+	public final int WOOD_BASE_ENEMY_ARMY = 35000;
+	public final int FOOD_BASE_ENEMY_ARMY = 18000;
 
 	// percentage increase of resources available to create enemy fleet
 	public final int ENEMY_FLEET_INCREASE = 6;
