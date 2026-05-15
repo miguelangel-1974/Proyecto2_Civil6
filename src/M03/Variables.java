@@ -2,19 +2,19 @@ package M03;
 
 public interface Variables {
 	// Variables de tiempos
-	public final int RESOURCES_GENERATOR_TIME = 60000;
+	public final int RESOURCES_GENERATOR_TIME = 30000;
 	public final int AUTO_SAVE_TIME = 60000;
 	public final int AUTO_GENERATE_BATTLE = 180000;
-	
+
 	// resources available to create the first enemy fleet
-	public final int IRON_BASE_ENEMY_ARMY = 26000;
-	public final int WOOD_BASE_ENEMY_ARMY = 180000;
-	public final int FOOD_BASE_ENEMY_ARMY = 70000;
+	public final int IRON_BASE_ENEMY_ARMY = 13000;
+	public final int WOOD_BASE_ENEMY_ARMY = 90000;
+	public final int FOOD_BASE_ENEMY_ARMY = 35000;
 
 	// percentage increase of resources available to create enemy fleet
 	public final int ENEMY_FLEET_INCREASE = 6;
 
-	// resources increment every minute
+	// resources increment every minute (tick)
 	public final int CIVILIZATION_IRON_GENERATED = 1500;
 	public final int CIVILIZATION_WOOD_GENERATED = 5000;
 	public final int CIVILIZATION_FOOD_GENERATED = 8000;
@@ -22,13 +22,13 @@ public interface Variables {
 	public final int CIVILIZATION_IRON_GENERATED_PER_SMITHY = (int) (0.5 * CIVILIZATION_IRON_GENERATED);
 	public final int CIVILIZATION_WOOD_GENERATED_PER_CARPENTRY = (int) (0.5 * CIVILIZATION_WOOD_GENERATED);
 	public final int CIVILIZATION_FOOD_GENERATED_PER_FARM = (int) (0.5 * CIVILIZATION_FOOD_GENERATED);
-	public final int CIVILIZATION_MANA_GENERATED_PER_MAGIC_TOWER = 10;
+	public final int CIVILIZATION_MANA_GENERATED_PER_MAGIC_TOWER = 20;
 
 	// TECHNOLOGY COST
-	public final int UPGRADE_BASE_DEFENSE_TECHNOLOGY_IRON_COST = 2000;
-	public final int UPGRADE_BASE_ATTACK_TECHNOLOGY_IRON_COST = 2000;
-	public final int UPGRADE_PLUS_DEFENSE_TECHNOLOGY_IRON_COST = 60;
-	public final int UPGRADE_PLUS_ATTACK_TECHNOLOGY_IRON_COST = 60;
+	public final int UPGRADE_BASE_DEFENSE_TECHNOLOGY_IRON_COST = 1000;
+	public final int UPGRADE_BASE_ATTACK_TECHNOLOGY_IRON_COST = 1000;
+	public final int UPGRADE_PLUS_DEFENSE_TECHNOLOGY_IRON_COST = 30;
+	public final int UPGRADE_PLUS_ATTACK_TECHNOLOGY_IRON_COST = 30;
 
 	public final int UPGRADE_BASE_DEFENSE_TECHNOLOGY_WOOD_COST = 0;
 	public final int UPGRADE_BASE_ATTACK_TECHNOLOGY_WOOD_COST = 0;
@@ -36,20 +36,20 @@ public interface Variables {
 	public final int UPGRADE_PLUS_ATTACK_TECHNOLOGY_WOOD_COST = 0;
 
 	// COST ATTACK UNITS
-	public final int FOOD_COST_SWORDSMAN = 8000;
-	public final int FOOD_COST_SPEARMAN = 5000;
+	public final int FOOD_COST_SWORDSMAN = 4000;
+	public final int FOOD_COST_SPEARMAN = 2500;
 	public final int FOOD_COST_CROSSBOW = 0;
 	public final int FOOD_COST_CANNON = 0;
 
-	public final int WOOD_COST_SWORDSMAN = 3000;
-	public final int WOOD_COST_SPEARMAN = 6500;
-	public final int WOOD_COST_CROSSBOW = 45000;
-	public final int WOOD_COST_CANNON = 30000;
+	public final int WOOD_COST_SWORDSMAN = 1500;
+	public final int WOOD_COST_SPEARMAN = 3000;
+	public final int WOOD_COST_CROSSBOW = 20000;
+	public final int WOOD_COST_CANNON = 15000;
 
-	public final int IRON_COST_SWORDSMAN = 50;
-	public final int IRON_COST_SPEARMAN = 50;
-	public final int IRON_COST_CROSSBOW = 7000;
-	public final int IRON_COST_CANNON = 15000;
+	public final int IRON_COST_SWORDSMAN = 25;
+	public final int IRON_COST_SPEARMAN = 25;
+	public final int IRON_COST_CROSSBOW = 3500;
+	public final int IRON_COST_CANNON = 7500;
 
 	public final int MANA_COST_SWORDSMAN = 0;
 	public final int MANA_COST_SPEARMAN = 0;
@@ -58,12 +58,12 @@ public interface Variables {
 
 	// COST DEFENSES ARROWTOWER, CATAPULT, ROCKETLAUNCHERTOWER
 	public final int IRON_COST_ARROWTOWER = 0;
-	public final int IRON_COST_CATAPULT = 500;
-	public final int IRON_COST_ROCKETLAUNCHERTOWER = 5000;
+	public final int IRON_COST_CATAPULT = 250;
+	public final int IRON_COST_ROCKETLAUNCHERTOWER = 2500;
 
-	public final int WOOD_COST_ARROWTOWER = 2000;
-	public final int WOOD_COST_CATAPULT = 4000;
-	public final int WOOD_COST_ROCKETLAUNCHERTOWER = 50000;
+	public final int WOOD_COST_ARROWTOWER = 1000;
+	public final int WOOD_COST_CATAPULT = 2000;
+	public final int WOOD_COST_ROCKETLAUNCHERTOWER = 25000;
 
 	public final int FOOD_COST_ARROWTOWER = 0;
 	public final int FOOD_COST_CATAPULT = 0;
@@ -74,17 +74,17 @@ public interface Variables {
 	public final int MANA_COST_ROCKETLAUNCHERTOWER = 0;
 
 	// Cost Especial units
-	public final int FOOD_COST_MAGICIAN = 12000;
-	public final int FOOD_COST_PRIEST = 15000;
+	public final int FOOD_COST_MAGICIAN = 6000;
+	public final int FOOD_COST_PRIEST = 7500;
 
-	public final int WOOD_COST_MAGICIAN = 2000;
+	public final int WOOD_COST_MAGICIAN = 1000;
 	public final int WOOD_COST_PRIEST = 0;
 
-	public final int IRON_COST_MAGICIAN = 500;
+	public final int IRON_COST_MAGICIAN = 250;
 	public final int IRON_COST_PRIEST = 0;
 
-	public final int MANA_COST_MAGICIAN = 5000;
-	public final int MANA_COST_PRIEST = 15000;
+	public final int MANA_COST_MAGICIAN = 2500;
+	public final int MANA_COST_PRIEST = 7500;
 
 	// array units costs SWORDSMAN, SPEARMAN, CROSSBOW, CANNON, ARROWTOWER, CATAPULT, ROCKETLAUNCHERTOWER, MAGICIAN, PRIEST
 	public final int[] WOOD_COST_UNITS = { WOOD_COST_SWORDSMAN, WOOD_COST_SPEARMAN, WOOD_COST_CROSSBOW,
@@ -100,26 +100,26 @@ public interface Variables {
 			FOOD_COST_MAGICIAN, FOOD_COST_PRIEST };
 
 	// Cost Buildings
-	public final int FOOD_COST_FARM = 5000;
-	public final int WOOD_COST_FARM = 10000;
-	public final int IRON_COST_FARM = 12000;
+	public final int FOOD_COST_FARM = 2500;
+	public final int WOOD_COST_FARM = 5000;
+	public final int IRON_COST_FARM = 6000;
 
-	public final int FOOD_COST_CARPENTRY = 5000;
-	public final int WOOD_COST_CARPENTRY = 10000;
-	public final int IRON_COST_CARPENTRY = 12000;
+	public final int FOOD_COST_CARPENTRY = 2500;
+	public final int WOOD_COST_CARPENTRY = 5000;
+	public final int IRON_COST_CARPENTRY = 6000;
 
-	public final int FOOD_COST_SMITHY = 5000;
-	public final int WOOD_COST_SMITHY = 10000;
-	public final int IRON_COST_SMITHY = 12000;
+	public final int FOOD_COST_SMITHY = 2500;
+	public final int WOOD_COST_SMITHY = 5000;
+	public final int IRON_COST_SMITHY = 6000;
 
-	public final int FOOD_COST_CHURCH = 5000;
-	public final int WOOD_COST_CHURCH = 10000;
-	public final int IRON_COST_CHURCH = 12000;
-	public final int MANA_COST_CHURCH = 10000;
+	public final int FOOD_COST_CHURCH = 2500;
+	public final int WOOD_COST_CHURCH = 5000;
+	public final int IRON_COST_CHURCH = 6000;
+	public final int MANA_COST_CHURCH = 5000;
 
-	public final int FOOD_COST_MAGICTOWER = 5000;
-	public final int WOOD_COST_MAGICTOWER = 10000;
-	public final int IRON_COST_MAGICTOWER = 12000;
+	public final int FOOD_COST_MAGICTOWER = 2500;
+	public final int WOOD_COST_MAGICTOWER = 5000;
+	public final int IRON_COST_MAGICTOWER = 6000;
 
 	// BASE DAMAGE ATTACK UNITS
 	public final int BASE_DAMAGE_SWORDSMAN = 80;
@@ -143,14 +143,14 @@ public interface Variables {
 	public final int ARMOR_ARROWTOWER = 200;
 	public final int ARMOR_CATAPULT = 1200;
 	public final int ARMOR_ROCKETLAUNCHERTOWER = 7000;
-	
-	//ARMOR ESPECIALES
+
+	// ARMOR ESPECIALES
 	public final int ARMOR_MAGICIAN = 500;
 	public final int ARMOR_PRIEST = 300;
 	// PLUS ARMOR ESPECIALES
 	public final int PLUS_ARMOR_MAGICIAN_BY_TECHNOLOGY = 5;
 	public final int PLUS_ARMOR_PRIEST_BY_TECHNOLOGY = 5;
-	//BASE DAMAGE DEL PRIEST
+	// BASE DAMAGE DEL PRIEST
 	public final int BASE_DAMAGE_PRIEST = 0;
 	public final int PLUS_ATTACK_PRIEST_BY_TECHNOLOGY = 0;
 
@@ -205,14 +205,14 @@ public interface Variables {
 	// AttackUnit chance to attack again
 	public final int CHANCE_ATTACK_AGAIN_SWORDSMAN = 3;
 	public final int CHANCE_ATTACK_AGAIN_SPEARMAN = 7;
-	public final int CHANCE_ATTACK_AGAIN_CROSSBOW = 45;
-	public final int CHANCE_ATTACK_AGAIN_CANNON = 70;
+	public final int CHANCE_ATTACK_AGAIN_CROSSBOW = 25;
+	public final int CHANCE_ATTACK_AGAIN_CANNON = 40;
 
 	// Defense chance to attack again
 	public final int CHANCE_ATTACK_AGAIN_ARROWTOWER = 5;
 	public final int CHANCE_ATTACK_AGAIN_CATAPULT = 12;
 	public final int CHANCE_ATTACK_AGAIN_ROCKETLAUNCHERTOWER = 30;
-	public final int CHANCE_ATTACK_AGAIN_MAGICIAN = 75;
+	public final int CHANCE_ATTACK_AGAIN_MAGICIAN = 30;
 	public final int CHANCE_ATTACK_AGAIN_PRIEST = 0;
 
 	// CHANCE ATTACK EVERY UNIT
