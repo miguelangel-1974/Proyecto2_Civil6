@@ -1,0 +1,45 @@
+<div class="mb-6 flex items-center justify-between">
+    <h1 class="text-4xl font-serif font-bold text-white">Informe Táctico <span class="text-red-500">#{{idBatalla}}</span></h1>
+    <a href="/batallas" class="text-blue-400 hover:text-white transition">&larr; Volver a Batallas</a>
+</div>
+
+{{#if summary}}
+<div class="flex flex-wrap gap-6 mb-10 glass-panel p-6 rounded-xl bg-slate-800/50 border border-slate-700">
+    <div class="w-full mb-2"><h3 class="text-lg text-slate-400 uppercase tracking-widest font-bold">Residuos Generados / Recuperados</h3></div>
+    
+    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-lg flex-1">
+        <div class="text-5xl">🪵</div>
+        <div>
+            <p class="text-sm text-amber-600 font-bold uppercase">Madera</p>
+            <p class="text-2xl font-bold">{{summary.wood_acquired}}</p>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-4 bg-slate-900 p-4 rounded-lg flex-1">
+        <div class="text-5xl">🪨</div>
+        <div>
+            <p class="text-sm text-gray-400 font-bold uppercase">Hierro</p>
+            <p class="text-2xl font-bold">{{summary.iron_acquired}}</p>
+        </div>
+    </div>
+</div>
+{{/if}}
+
+<div class="glass-panel rounded-2xl overflow-hidden">
+    <div class="bg-slate-800 px-6 py-4 border-b border-slate-700">
+        <h2 class="text-xl font-bold font-mono text-green-400">>_ Desarrollo del Combate</h2>
+    </div>
+    <div class="p-6 font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
+        {{#if logs}}
+            {{#each logs}}
+                {{#if (eq this.log_entry "********************CHANGE ATTACKER********************")}}
+                    <p class="text-yellow-500 my-4 text-center">================== CAMBIO DE TURNO ==================</p>
+                {{else}}
+                    <p class="mb-1 text-slate-300">{{this.log_entry}}</p>
+                {{/if}}
+            {{/each}}
+        {{else}}
+            <p class="text-red-400">El archivo de esta batalla está corrupto o aún no se ha procesado.</p>
+        {{/if}}
+    </div>
+</div>
