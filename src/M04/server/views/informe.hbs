@@ -11,7 +11,6 @@
         {{/if}}
     </div>
     <div class="flex items-center gap-4">
-        {{!-- Badge resultado --}}
         {{#if (eq battleResult 'victoria')}}
             <span class="bg-green-700/70 text-green-200 text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider">⚔️ Victoria</span>
         {{else if (eq battleResult 'derrota')}}
@@ -23,7 +22,7 @@
     </div>
 </div>
 
-{{!-- BLOQUE RESUMEN: recursos + bajas totales --}}
+{{!-- BLOQUE RESUMEN --}}
 {{#if summary}}
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
     <div class="glass-panel bg-slate-800/50 rounded-xl p-4 flex items-center gap-3">
@@ -44,18 +43,14 @@
         <span class="text-4xl">🛡️</span>
         <div>
             <p class="text-xs text-blue-400 font-bold uppercase">Bajas propias</p>
-            <p class="text-2xl font-bold text-blue-300">
-                {{#if civDefStats}}{{#each civDefStats}}{{drops}}{{/each}}{{else}}—{{/if}}
-            </p>
+            <p class="text-2xl font-bold text-blue-300">{{totalCivDrops}}</p>
         </div>
     </div>
     <div class="glass-panel bg-red-900/30 rounded-xl p-4 flex items-center gap-3">
         <span class="text-4xl">💀</span>
         <div>
             <p class="text-xs text-red-400 font-bold uppercase">Bajas enemigas</p>
-            <p class="text-2xl font-bold text-red-300">
-                {{#if enemyAtkStats}}{{#each enemyAtkStats}}{{drops}}{{/each}}{{else}}—{{/if}}
-            </p>
+            <p class="text-2xl font-bold text-red-300">{{totalEnemyDrops}}</p>
         </div>
     </div>
 </div>
@@ -64,13 +59,13 @@
 {{!-- TABLAS DE BAJAS DETALLADAS --}}
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
-    {{!-- Bajas propias: ataque + defensa --}}
+    {{!-- Bajas propias --}}
     <div class="glass-panel rounded-xl overflow-hidden">
         <div class="bg-blue-900/40 px-5 py-3 border-b border-blue-800/50">
             <h2 class="font-bold text-blue-300 uppercase tracking-widest text-sm">🛡️ Bajas Propias</h2>
         </div>
         <div class="overflow-x-auto">
-            {{#if civDefStats}}
+            {{#if civAtkStats}}
             <table class="w-full text-sm text-left">
                 <thead>
                     <tr class="bg-slate-800 text-slate-400 text-xs uppercase">
@@ -81,6 +76,14 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{#each civAtkStats}}
+                    <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
+                        <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
+                        <td class="px-4 py-2 text-center text-red-400 font-bold">{{this.drops}}</td>
+                        <td class="px-4 py-2 text-center text-green-400">{{subtract this.initial this.drops}}</td>
+                    </tr>
+                    {{/each}}
                     {{#each civDefStats}}
                     <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
                         <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
@@ -89,7 +92,7 @@
                         <td class="px-4 py-2 text-center text-green-400">{{subtract this.initial this.drops}}</td>
                     </tr>
                     {{/each}}
-                    {{#each civAtkStats}}
+                    {{#each civEspStats}}
                     <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
                         <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
                         <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
@@ -145,15 +148,9 @@
     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700">
         <h2 class="text-xl font-bold font-mono text-green-400">>_ Desarrollo del Combate</h2>
     </div>
-    <div class="p-6 font-mono text-sm leading-relaxed max-h-96 overflow-y-auto">
-        {{#if logs}}
-            {{#each logs}}
-                {{#if (eq this.log_entry "********************CHANGE ATTACKER********************")}}
-                    <p class="text-yellow-500 my-4 text-center">================== CAMBIO DE TURNO ==================</p>
-                {{else}}
-                    <p class="mb-1 text-slate-300">{{this.log_entry}}</p>
-                {{/if}}
-            {{/each}}
+    <div class="p-6 max-h-[600px] overflow-y-auto">
+        {{#if logText}}
+            <pre class="font-mono text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{{logText}}</pre>
         {{else}}
             <p class="text-red-400">El archivo de esta batalla está corrupto o aún no se ha procesado.</p>
         {{/if}}

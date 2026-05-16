@@ -99,16 +99,30 @@ public class ConexionBD {
     	return false;
     }
     
-    public int crearNuevaPartida(int userID, String nombreCiv) {
+    public int crearNuevaPartida(int userID, String nombreCiv, Civilization civ) {
         int idGenerado = -1;
-        String sql = "INSERT INTO Civilization_stats (user_id, name) VALUES (?, ?)";
+        String sql = "INSERT INTO Civilization_stats (user_id, name, wood_amount, iron_amount, food_amount, mana_amount, "
+    			+ "magicTower_counter, church_counter, farm_counter, smithy_counter, carpentry_counter, technology_defense_level, "
+    			+ "technology_attack_level, battles_counter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try {
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            
-            ps.setInt(1, userID);
-            ps.setString(2, nombreCiv);
-            ps.executeUpdate();
+
+        	PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        	ps.setInt(1,  userID);
+        	ps.setString(2,  nombreCiv);
+        	ps.setInt(3,  civ.getWood());
+        	ps.setInt(4,  civ.getIron());
+        	ps.setInt(5,  civ.getFood());
+        	ps.setInt(6,  civ.getMana());
+        	ps.setInt(7,  civ.getMagicTower());
+        	ps.setInt(8,  civ.getChurch());
+        	ps.setInt(9,  civ.getFarm());
+	        ps.setInt(10,  civ.getSmithy());
+	        ps.setInt(11,  civ.getCarpentry());
+	        ps.setInt(12, civ.getTechnologyDefense());
+	        ps.setInt(13, civ.getTechnologyAtack());
+	        ps.setInt(14, civ.getBattles());
+	        ps.executeUpdate();
             
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -116,7 +130,7 @@ public class ConexionBD {
                 System.out.println("Partida creada con ID: " + idGenerado);
             }
         } catch (SQLException e) {
-            System.out.println("Error: El usuario ya tiene una partida activa o hubo un fallo de conexión.");
+            System.out.println("Error: Hubo un fallo de conexión.");
             e.printStackTrace();
         }
         return idGenerado;
@@ -496,72 +510,34 @@ public class ConexionBD {
             // -----------------------------------------------------------------
             // 1. Battle_stats  (fila raíz de la batalla)
             // -----------------------------------------------------------------
-            String sqlStats =
-                "INSERT INTO Battle_stats (civilization_id, num_battle, wood_acquired, iron_acquired) " +
-                "VALUES (?, ?, ?, ?)";
-            PreparedStatement psStats = conn.prepareStatement(sqlStats);
-            psStats.setInt(1, idCiv);
-            psStats.setInt(2, numBatalla);
-            // Solo se recoge el waste si la civilización gana
-            psStats.setInt(3, ganaCiv ? wasteWoodIron[0] : 0);
-            psStats.setInt(4, ganaCiv ? wasteWoodIron[1] : 0);
-            psStats.executeUpdate();
-            System.out.println("Battle_stats guardado (batalla " + numBatalla + ").");
+        	String sqlStats =
+        		    "INSERT INTO Battle_stats (civilization_id, num_battle, wood_acquired, iron_acquired, result) " +
+        		    "VALUES (?, ?, ?, ?, ?)";
+    		PreparedStatement psStats = conn.prepareStatement(sqlStats);
+    		psStats.setInt(1, idCiv);
+    		psStats.setInt(2, numBatalla);
+    		psStats.setInt(3, ganaCiv ? wasteWoodIron[0] : 0);
+    		psStats.setInt(4, ganaCiv ? wasteWoodIron[1] : 0);
+    		psStats.setString(5, ganaCiv ? "victoria" : "derrota");  // <-- resultado directo
+    		psStats.executeUpdate();
      
             // -----------------------------------------------------------------
             // 2. Battle_log  (una fila por línea del log)
             // -----------------------------------------------------------------
-            String sqlLog =
-            	    "INSERT INTO Battle_log (civilization_id, num_battle, num_line, log_entry) " +
-            	    "VALUES (?, ?, ?, ?)";
-        	PreparedStatement psLog = conn.prepareStatement(sqlLog);
+    		String logCompleto = batalla.getBattleDevelopment()
+    			    + "\n\n============================================\n"
+    			    + "RESUMEN FINAL DE LA BATALLA\n"
+    			    + "============================================\n\n"
+    			    + batalla.getBattleReport(batalla.getCivilization().getBattles());
 
-        	// 1. Obtenemos las líneas del desarrollo
-        	String[] lineasDesarrollo = batalla.getBattleDevelopment().split("\n");
-        	int lineCount = 0;
-
-        	// Insertar desarrollo
-        	for (int i = 0; i < lineasDesarrollo.length; i++) {
-        	    if (!lineasDesarrollo[i].trim().isEmpty()) {
-        	        lineCount++;
-        	        psLog.setInt(1, idCiv);
-        	        psLog.setInt(2, numBatalla);
-        	        psLog.setInt(3, lineCount);
-        	        psLog.setString(4, lineasDesarrollo[i]);
-        	        psLog.addBatch();
-        	    }
-        	}
-
-        	// 2. Añadir una línea separadora y el REPORTE FINAL
-        	lineCount++;
-        	psLog.setInt(1, idCiv);
-        	psLog.setInt(2, numBatalla);
-        	psLog.setInt(3, lineCount);
-        	psLog.setString(4, "============================================");
-        	psLog.addBatch();
-
-        	lineCount++;
-        	psLog.setInt(1, idCiv);
-        	psLog.setInt(2, numBatalla);
-        	psLog.setInt(3, lineCount);
-        	psLog.setString(4, "RESUMEN FINAL DE LA BATALLA");
-        	psLog.addBatch();
-
-        	// 3. Obtener líneas del reporte e insertarlas
-        	String[] lineasReporte = batalla.getBattleReport(batalla.getCivilization().getBattles()).split("\n");
-        	for (int i = 0; i < lineasReporte.length; i++) {
-        	    if (!lineasReporte[i].trim().isEmpty()) {
-        	        lineCount++;
-        	        psLog.setInt(1, idCiv);
-        	        psLog.setInt(2, numBatalla);
-        	        psLog.setInt(3, lineCount);
-        	        psLog.setString(4, lineasReporte[i]);
-        	        psLog.addBatch();
-        	    }
-        	}
-
-        	psLog.executeBatch();
-        	System.out.println("Battle_log guardado (" + lineCount + " líneas totales: Desarrollo + Reporte).");
+			String sqlLog =
+			    "INSERT INTO Battle_log (civilization_id, num_battle, log_text) VALUES (?, ?, ?)";
+			PreparedStatement psLog = conn.prepareStatement(sqlLog);
+			psLog.setInt(1, idCiv);
+			psLog.setInt(2, numBatalla);
+			psLog.setString(3, logCompleto);
+			psLog.executeUpdate();
+			System.out.println("Battle_log guardado (texto completo).");
      
             // -----------------------------------------------------------------
             // 3. Civilization_attack_stats  (Swordsman, Spearman, Crossbow, Cannon)

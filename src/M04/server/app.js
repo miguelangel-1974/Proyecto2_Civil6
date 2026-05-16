@@ -125,66 +125,26 @@ app.get('/batallas', async (req, res) => {
   try {
     const rawTotal = await db.query(`SELECT COUNT(*) as total FROM Battle_stats`);
     const totalBattles = rawTotal.length > 0 ? rawTotal[0].total : 0;
- 
-    // Traer todas las batallas con nombre de civilización y jugador
+
     const rawBattles = await db.query(`
       SELECT 
-        bs.civilization_id,
-        bs.num_battle,
-        bs.wood_acquired,
-        bs.iron_acquired,
-        c.name   AS civ_name,
-        u.username
+        bs.civilization_id, bs.num_battle, bs.wood_acquired, bs.iron_acquired, bs.result,
+        c.name AS civ_name, u.username,
+        COALESCE((SELECT SUM(drops) FROM Civilization_attack_stats  WHERE civilization_id = bs.civilization_id AND num_battle = bs.num_battle), 0) +
+        COALESCE((SELECT SUM(drops) FROM Civilization_defense_stats WHERE civilization_id = bs.civilization_id AND num_battle = bs.num_battle), 0) +
+        COALESCE((SELECT SUM(drops) FROM Civilization_special_stats  WHERE civilization_id = bs.civilization_id AND num_battle = bs.num_battle), 0) AS civ_drops,
+        COALESCE((SELECT SUM(drops) FROM Enemy_attack_stats          WHERE civilization_id = bs.civilization_id AND num_battle = bs.num_battle), 0) AS enemy_drops
       FROM Battle_stats bs
       JOIN Civilization_stats c ON bs.civilization_id = c.civilization_id
-      JOIN Users u              ON c.user_id = u.user_id
+      JOIN Users u ON c.user_id = u.user_id
       ORDER BY bs.num_battle DESC
     `);
-    const battles = db.table_to_json(rawBattles, { num_battle: 'number', wood_acquired: 'number', iron_acquired: 'number' });
- 
-    // Para cada batalla, detectar victoria leyendo la última línea del log
-    const battlesWithResult = await Promise.all(battles.map(async (b) => {
-      try {
-        const rawLastLog = await db.query(`
-          SELECT log_entry FROM Battle_log
-          WHERE civilization_id = ${b.civilization_id} AND num_battle = ${b.num_battle}
-          ORDER BY num_line DESC LIMIT 5
-        `);
-        const lastLines = rawLastLog.map(r => (r.log_entry || '').toUpperCase());
-        let result = 'unknown';
-        for (const line of lastLines) {
-          if (line.includes('VICTORIA') || line.includes('VICTORY') || line.includes('WIN')) {
-            result = 'victoria'; break;
-          }
-          if (line.includes('DERROTA') || line.includes('DEFEAT') || line.includes('LOSS') || line.includes('LOST')) {
-            result = 'derrota'; break;
-          }
-        }
- 
-        // Bajas totales propias y enemigas
-        const rawCivDrops = await db.query(`
-          SELECT COALESCE(SUM(drops), 0) AS total_drops
-          FROM Civilization_defense_stats
-          WHERE civilization_id = ${b.civilization_id} AND num_battle = ${b.num_battle}
-        `);
-        const rawEnemyDrops = await db.query(`
-          SELECT COALESCE(SUM(drops), 0) AS total_drops
-          FROM Enemy_attack_stats
-          WHERE civilization_id = ${b.civilization_id} AND num_battle = ${b.num_battle}
-        `);
- 
-        return {
-          ...b,
-          result,
-          civ_drops:   rawCivDrops[0]?.total_drops   ?? 0,
-          enemy_drops: rawEnemyDrops[0]?.total_drops  ?? 0,
-        };
-      } catch {
-        return { ...b, result: 'unknown', civ_drops: 0, enemy_drops: 0 };
-      }
-    }));
- 
-    res.render('batallas', { title: 'Registro de Batallas', totalBattles, battles: battlesWithResult });
+    const battles = db.table_to_json(rawBattles, {
+      num_battle: 'number', wood_acquired: 'number', iron_acquired: 'number',
+      civ_drops: 'number', enemy_drops: 'number'
+    });
+
+    res.render('batallas', { title: 'Registro de Batallas', totalBattles, battles });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error BD");
@@ -195,69 +155,50 @@ app.get('/batallas', async (req, res) => {
 app.get('/informe', async (req, res) => {
   try {
     const idBatalla = req.query.informe;
-    const idCiv     = req.query.civ;        // <-- ahora se pasa también el civilization_id
+    const idCiv     = req.query.civ;
     if (!idBatalla || !idCiv) return res.redirect('/batallas');
- 
-    // Log de combate
-    const rawLogs = await db.query(`
-      SELECT log_entry FROM Battle_log
+
+    const rawLog = await db.query(`
+      SELECT log_text FROM Battle_log
       WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}
-      ORDER BY num_line ASC
     `);
-    const logs = db.table_to_json(rawLogs);
- 
-    // Resumen de recursos + civilización + jugador
+    const logText = rawLog.length > 0 ? rawLog[0].log_text : null;
+
     const rawSummary = await db.query(`
       SELECT bs.*, c.name AS civ_name, u.username
       FROM Battle_stats bs
       JOIN Civilization_stats c ON bs.civilization_id = c.civilization_id
-      JOIN Users u              ON c.user_id = u.user_id
+      JOIN Users u ON c.user_id = u.user_id
       WHERE bs.civilization_id = ${idCiv} AND bs.num_battle = ${idBatalla}
     `);
     const summary = rawSummary.length > 0 ? db.table_to_json(rawSummary)[0] : null;
- 
-    // Bajas propias (defensa) por tipo
-    const rawCivAtk = await db.query(`
-      SELECT type, initial, drops FROM Civilization_attack_stats
-      WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}
-    `);
-    const civAtkStats = db.table_to_json(rawCivAtk, { initial: 'number', drops: 'number' });
- 
-    const rawCivDef = await db.query(`
-      SELECT type, initial, drops FROM Civilization_defense_stats
-      WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}
-    `);
-    const civDefStats = db.table_to_json(rawCivDef, { initial: 'number', drops: 'number' });
- 
-    // Bajas enemigas por tipo
-    const rawEnemyAtk = await db.query(`
-      SELECT type, initial, drops FROM Enemy_attack_stats
-      WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}
-    `);
+
+    const rawCivAtk   = await db.query(`SELECT type, initial, drops FROM Civilization_attack_stats  WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}`);
+    const rawCivDef   = await db.query(`SELECT type, initial, drops FROM Civilization_defense_stats WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}`);
+    const rawCivEsp   = await db.query(`SELECT type, initial, drops FROM Civilization_special_stats  WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}`);
+    const rawEnemyAtk = await db.query(`SELECT type, initial, drops FROM Enemy_attack_stats          WHERE civilization_id = ${idCiv} AND num_battle = ${idBatalla}`);
+
+    const civAtkStats   = db.table_to_json(rawCivAtk,   { initial: 'number', drops: 'number' });
+    const civDefStats   = db.table_to_json(rawCivDef,   { initial: 'number', drops: 'number' });
+    const civEspStats   = db.table_to_json(rawCivEsp,   { initial: 'number', drops: 'number' });
     const enemyAtkStats = db.table_to_json(rawEnemyAtk, { initial: 'number', drops: 'number' });
- 
-    // Detectar resultado en las últimas líneas del log
-    let battleResult = 'unknown';
-    const lastLines = logs.slice(-5).map(l => (l.log_entry || '').toUpperCase());
-    for (const line of lastLines) {
-      if (line.includes('VICTORIA') || line.includes('VICTORY') || line.includes('WIN')) {
-        battleResult = 'victoria'; break;
-      }
-      if (line.includes('DERROTA') || line.includes('DEFEAT') || line.includes('LOSS') || line.includes('LOST')) {
-        battleResult = 'derrota'; break;
-      }
-    }
- 
+
+    const totalCivDrops   = [...civAtkStats, ...civDefStats, ...civEspStats].reduce((sum, u) => sum + (u.drops || 0), 0);
+    const totalEnemyDrops = enemyAtkStats.reduce((sum, u) => sum + (u.drops || 0), 0);
+
     res.render('informe', {
       title: `Informe Batalla #${idBatalla}`,
-      logs,
+      logText,
       summary,
       idBatalla,
       idCiv,
-      battleResult,
+      battleResult: summary ? summary.result : 'unknown',
       civAtkStats,
       civDefStats,
+      civEspStats,
       enemyAtkStats,
+      totalCivDrops,
+      totalEnemyDrops,
     });
   } catch (err) {
     console.error(err);

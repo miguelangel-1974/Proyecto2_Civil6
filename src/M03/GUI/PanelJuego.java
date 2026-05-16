@@ -70,6 +70,7 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	private EnemyArmyGenerator generarEnemigos;
 
 	private Timer timer;
+	private Timer timerGuardarParida;
 	
 	public PanelJuego(VentanaPrincipal ventana, Civilization civ, ConexionBD conexion, int idCiv, int userID) {
 		this.ventana = ventana;
@@ -106,6 +107,15 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	}
 
 	private void comenzarTimers() {
+		timerGuardarParida = new Timer();
+		
+		timerGuardarParida.scheduleAtFixedRate(new TimerTask() {
+	        public void run() {
+	            conexion.guardarPartida(miCiv, idCiv, userID);
+	            conexion.guardarEdificios(idCiv, edificiosColocados);
+	        }
+	    }, AUTO_SAVE_TIME, AUTO_SAVE_TIME);
+		
 		timer = new Timer();
 		
 		timer.scheduleAtFixedRate(new TimerTask() {
@@ -115,13 +125,6 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	    }, 0, 50);
 		
 		timer.scheduleAtFixedRate(generador, RESOURCES_GENERATOR_TIME, RESOURCES_GENERATOR_TIME);
-		
-		timer.scheduleAtFixedRate(new TimerTask() {
-	        public void run() {
-	            conexion.guardarPartida(miCiv, idCiv, userID);
-	            conexion.guardarEdificios(idCiv, edificiosColocados);
-	        }
-	    }, AUTO_SAVE_TIME, AUTO_SAVE_TIME);
 		
 		timer.scheduleAtFixedRate(new TimerTask() {
 	        public void run() {
@@ -138,6 +141,8 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 	            batalla.pelear();
 	            
 	            conexion.guardarBatalla(batalla, idCiv);
+	            conexion.guardarPartida(miCiv, idCiv, userID);
+	            conexion.guardarEdificios(idCiv, edificiosColocados);
 	            
 	            String reporte = batalla.getBattleReport(miCiv.getBattles());
 	            String battleDevelopment = batalla.getBattleDevelopment();
