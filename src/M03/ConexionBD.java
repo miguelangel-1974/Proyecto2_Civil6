@@ -99,16 +99,30 @@ public class ConexionBD {
     	return false;
     }
     
-    public int crearNuevaPartida(int userID, String nombreCiv) {
+    public int crearNuevaPartida(int userID, String nombreCiv, Civilization civ) {
         int idGenerado = -1;
-        String sql = "INSERT INTO Civilization_stats (user_id, name) VALUES (?, ?)";
+        String sql = "INSERT INTO Civilization_stats (user_id, name, wood_amount, iron_amount, food_amount, mana_amount, "
+    			+ "magicTower_counter, church_counter, farm_counter, smithy_counter, carpentry_counter, technology_defense_level, "
+    			+ "technology_attack_level, battles_counter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try {
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            
-            ps.setInt(1, userID);
-            ps.setString(2, nombreCiv);
-            ps.executeUpdate();
+
+        	PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        	ps.setInt(1,  userID);
+        	ps.setString(2,  nombreCiv);
+        	ps.setInt(3,  civ.getWood());
+        	ps.setInt(4,  civ.getIron());
+        	ps.setInt(5,  civ.getFood());
+        	ps.setInt(6,  civ.getMana());
+        	ps.setInt(7,  civ.getMagicTower());
+        	ps.setInt(8,  civ.getChurch());
+        	ps.setInt(9,  civ.getFarm());
+	        ps.setInt(10,  civ.getSmithy());
+	        ps.setInt(11,  civ.getCarpentry());
+	        ps.setInt(12, civ.getTechnologyDefense());
+	        ps.setInt(13, civ.getTechnologyAtack());
+	        ps.setInt(14, civ.getBattles());
+	        ps.executeUpdate();
             
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -116,7 +130,7 @@ public class ConexionBD {
                 System.out.println("Partida creada con ID: " + idGenerado);
             }
         } catch (SQLException e) {
-            System.out.println("Error: El usuario ya tiene una partida activa o hubo un fallo de conexión.");
+            System.out.println("Error: Hubo un fallo de conexión.");
             e.printStackTrace();
         }
         return idGenerado;
@@ -469,5 +483,151 @@ public class ConexionBD {
             e.printStackTrace();
         }
         return new String[0][3];
+    }
+    
+    public void guardarBatalla(Battle batalla, int idCiv) {
+    	 
+        int numBatalla = batalla.getCivilization().getBattles(); // ya fue incrementado al pelear()
+     
+        // Nombres de unidades en el mismo orden que initialArmies[fila][columna]
+        // Civ:   0=Swordsman, 1=Spearman, 2=Crossbow, 3=Cannon,
+        //        4=ArrowTower, 5=Catapult, 6=RocketLauncherTower,
+        //        7=Magician,   8=Priest
+        // Enemy: 0=Swordsman, 1=Spearman, 2=Crossbow, 3=Cannon
+        String[] tiposAtaque   = {"Swordsman", "Spearman", "Crossbow", "Cannon"};
+        String[] tiposDefensa  = {"ArrowTower", "Catapult", "RocketLauncherTower"};
+        String[] tiposEspecial = {"Magician", "Priest"};
+     
+        int[][] initialArmies            = batalla.getInitialArmies();           // [0]=civ, [1]=enemy
+        int[]   actualCiv                = batalla.getActualNumberUnitsCivilization();
+        int[]   actualEnemy              = batalla.getActualNumberUnitsEnemy();
+        int[][] initialCostFleet         = batalla.getInitialCostFleet();        // [0]=civ [1]=enemy, [food,wood,iron]
+        int[]   wasteWoodIron            = batalla.getWasteWoodIron();           // [wood, iron]
+        boolean ganaCiv = batalla.getResourcesLooses()[0][3] <= batalla.getResourcesLooses()[1][3];
+     
+        try {
+     
+            // -----------------------------------------------------------------
+            // 1. Battle_stats  (fila raíz de la batalla)
+            // -----------------------------------------------------------------
+        	String sqlStats =
+        		    "INSERT INTO Battle_stats (civilization_id, num_battle, wood_acquired, iron_acquired, result) " +
+        		    "VALUES (?, ?, ?, ?, ?)";
+    		PreparedStatement psStats = conn.prepareStatement(sqlStats);
+    		psStats.setInt(1, idCiv);
+    		psStats.setInt(2, numBatalla);
+    		psStats.setInt(3, ganaCiv ? wasteWoodIron[0] : 0);
+    		psStats.setInt(4, ganaCiv ? wasteWoodIron[1] : 0);
+    		psStats.setString(5, ganaCiv ? "victoria" : "derrota");  // <-- resultado directo
+    		psStats.executeUpdate();
+     
+            // -----------------------------------------------------------------
+            // 2. Battle_log  (una fila por línea del log)
+            // -----------------------------------------------------------------
+    		String logCompleto = batalla.getBattleDevelopment()
+    			    + "\n\n============================================\n"
+    			    + "RESUMEN FINAL DE LA BATALLA\n"
+    			    + "============================================\n\n"
+    			    + batalla.getBattleReport(batalla.getCivilization().getBattles());
+
+			String sqlLog =
+			    "INSERT INTO Battle_log (civilization_id, num_battle, log_text) VALUES (?, ?, ?)";
+			PreparedStatement psLog = conn.prepareStatement(sqlLog);
+			psLog.setInt(1, idCiv);
+			psLog.setInt(2, numBatalla);
+			psLog.setString(3, logCompleto);
+			psLog.executeUpdate();
+			System.out.println("Battle_log guardado (texto completo).");
+     
+            // -----------------------------------------------------------------
+            // 3. Civilization_attack_stats  (Swordsman, Spearman, Crossbow, Cannon)
+            // -----------------------------------------------------------------
+            String sqlCivAtk =
+                "INSERT INTO Civilization_attack_stats (civilization_id, num_battle, type, initial, drops) " +
+                "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement psCivAtk = conn.prepareStatement(sqlCivAtk);
+     
+            for (int i = 0; i < tiposAtaque.length; i++) {   // índices 0-3
+                int inicial = initialArmies[0][i];
+                int bajas   = inicial - actualCiv[i];
+                psCivAtk.setInt(1, idCiv);
+                psCivAtk.setInt(2, numBatalla);
+                psCivAtk.setString(3, tiposAtaque[i]);
+                psCivAtk.setInt(4, inicial);
+                psCivAtk.setInt(5, bajas);
+                psCivAtk.addBatch();
+            }
+            psCivAtk.executeBatch();
+            System.out.println("Civilization_attack_stats guardado.");
+     
+            // -----------------------------------------------------------------
+            // 4. Civilization_defense_stats  (ArrowTower, Catapult, RocketLauncherTower)
+            // -----------------------------------------------------------------
+            String sqlCivDef =
+                "INSERT INTO Civilization_defense_stats (civilization_id, num_battle, type, initial, drops) " +
+                "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement psCivDef = conn.prepareStatement(sqlCivDef);
+     
+            for (int i = 0; i < tiposDefensa.length; i++) {   // índices 4-6
+                int inicial = initialArmies[0][i + 4];
+                int bajas   = inicial - actualCiv[i + 4];
+                psCivDef.setInt(1, idCiv);
+                psCivDef.setInt(2, numBatalla);
+                psCivDef.setString(3, tiposDefensa[i]);
+                psCivDef.setInt(4, inicial);
+                psCivDef.setInt(5, bajas);
+                psCivDef.addBatch();
+            }
+            psCivDef.executeBatch();
+            System.out.println("Civilization_defense_stats guardado.");
+     
+            // -----------------------------------------------------------------
+            // 5. Civilization_special_stats  (Magician, Priest)
+            // -----------------------------------------------------------------
+            String sqlCivEsp =
+                "INSERT INTO Civilization_special_stats (civilization_id, num_battle, type, initial, drops) " +
+                "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement psCivEsp = conn.prepareStatement(sqlCivEsp);
+     
+            for (int i = 0; i < tiposEspecial.length; i++) {  // índices 7-8
+                int inicial = initialArmies[0][i + 7];
+                int bajas   = inicial - actualCiv[i + 7];
+                psCivEsp.setInt(1, idCiv);
+                psCivEsp.setInt(2, numBatalla);
+                psCivEsp.setString(3, tiposEspecial[i]);
+                psCivEsp.setInt(4, inicial);
+                psCivEsp.setInt(5, bajas);
+                psCivEsp.addBatch();
+            }
+            psCivEsp.executeBatch();
+            System.out.println("Civilization_special_stats guardado.");
+     
+            // -----------------------------------------------------------------
+            // 6. Enemy_attack_stats  (Swordsman, Spearman, Crossbow, Cannon)
+            // -----------------------------------------------------------------
+            String sqlEnemyAtk =
+                "INSERT INTO Enemy_attack_stats (civilization_id, num_battle, type, initial, drops) " +
+                "VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement psEnemyAtk = conn.prepareStatement(sqlEnemyAtk);
+     
+            for (int i = 0; i < tiposAtaque.length; i++) {   // índices 0-3
+                int inicial = initialArmies[1][i];
+                int bajas   = inicial - actualEnemy[i];
+                psEnemyAtk.setInt(1, idCiv);
+                psEnemyAtk.setInt(2, numBatalla);
+                psEnemyAtk.setString(3, tiposAtaque[i]);
+                psEnemyAtk.setInt(4, inicial);
+                psEnemyAtk.setInt(5, bajas);
+                psEnemyAtk.addBatch();
+            }
+            psEnemyAtk.executeBatch();
+            System.out.println("Enemy_attack_stats guardado.");
+     
+            System.out.println(">>> Batalla " + numBatalla + " guardada completamente en la BD.");
+     
+        } catch (SQLException e) {
+            System.out.println("Error al guardar la batalla " + numBatalla + ".");
+            e.printStackTrace();
+        }
     }
 }

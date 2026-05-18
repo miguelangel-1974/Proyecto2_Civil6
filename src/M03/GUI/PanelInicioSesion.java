@@ -160,12 +160,20 @@ class PanelInicioSesion extends JPanel implements ActionListener {
 	        public void actionPerformed(ActionEvent e) {
 	            String user = inputUsuario.getText();
 	            String pass = new String(inputContraseña.getPassword());
-	            boolean newUser = false;
 	            
-	            newUser = conexion.createUser(user, pass);
+	            if (user.isEmpty() || pass.isEmpty()) {
+	                JOptionPane.showMessageDialog(nuevaVentana, "Usuario y contraseña no pueden estar vacíos.");
+	                return;
+	            }
+	            if (user.length() < 4 || pass.length() < 4) {
+	                JOptionPane.showMessageDialog(nuevaVentana, "Usuario y contraseña deben tener mínimo 4 caracteres.");
+	                return;
+	            }
+	            
+	            boolean newUser = conexion.createUser(user, pass);
 	            
 	            if (newUser == false) {
-	            	JOptionPane.showMessageDialog(nuevaVentana, "Usuario ya en uso.\nPrueba otro usuario.");
+	            	JOptionPane.showMessageDialog(nuevaVentana, "Usuario ya en uso.\nPrueba otro nombre de usuario diferente.");
 	            } else {
 	            	JOptionPane.showMessageDialog(nuevaVentana, "Usuario creado correctamente.\nYa puedes iniciar sesión.");
 	            	nuevaVentana.dispose();

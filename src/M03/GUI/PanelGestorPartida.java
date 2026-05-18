@@ -55,11 +55,10 @@ class PanelGestorPartida extends JPanel implements Variables {
             public void actionPerformed(ActionEvent e) {
                 String nombre = JOptionPane.showInputDialog(ventana, "Nombre de la civilización:");
                 if (nombre != null && !nombre.trim().isEmpty()) {
-                    int idCiv = conexion.crearNuevaPartida(userID, nombre);
+                	Civilization miCiv = new Civilization();
+                    int idCiv = conexion.crearNuevaPartida(userID, nombre, miCiv);
                     
                     if (idCiv != -1) {
-                        Civilization miCiv = new Civilization();
-
                         ventana.cambiarPanel(new PanelJuego(ventana, miCiv, conexion, idCiv, userID));
                     } else {
                         JOptionPane.showMessageDialog(ventana, "Error al crear partida.");
