@@ -3,6 +3,11 @@ package M03;
 import java.util.ArrayList;
 import java.util.TimerTask;
 
+import M03.Unidades.UnidadesOfensivas.Cannon;
+import M03.Unidades.UnidadesOfensivas.Crossbow;
+import M03.Unidades.UnidadesOfensivas.Spearman;
+import M03.Unidades.UnidadesOfensivas.Swordsman;
+
 public class EnemyArmyGenerator extends TimerTask implements Variables {
 
 	private Civilization civilization;

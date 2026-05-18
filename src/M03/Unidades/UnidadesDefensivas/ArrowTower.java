@@ -1,4 +1,4 @@
-package M03;
+package M03.Unidades.UnidadesDefensivas;
 
 public class ArrowTower extends DefenseUnit {
 

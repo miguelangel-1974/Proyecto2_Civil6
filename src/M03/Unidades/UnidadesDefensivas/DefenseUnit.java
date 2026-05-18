@@ -1,18 +1,25 @@
-package M03;
+package M03.Unidades.UnidadesDefensivas;
 
-public abstract class SpecialUnit implements MilitaryUnit, Variables {
+import M03.MilitaryUnit;
+import M03.Variables;
+
+public abstract class DefenseUnit implements MilitaryUnit, Variables {
 
 	private int armor;
 	private int initialArmor;
 	private int baseDamage;
 	private int experience;
+	private boolean sanctified;
 
-	public SpecialUnit() {
+	public DefenseUnit() {
 
 	}
 
 	public int attack() {
 		int damage = this.baseDamage+ (this.experience * PLUS_ATTACK_UNIT_PER_EXPERIENCE_POINT * this.baseDamage / 100);
+		if (this.sanctified) {
+			damage = damage + (PLUS_ATTACK_UNIT_SANCTIFIED * this.baseDamage / 100);
+		}
 		return damage;
 	}
 
@@ -58,6 +65,14 @@ public abstract class SpecialUnit implements MilitaryUnit, Variables {
 
 	public void setExperience(int experience) {
 		this.experience = experience;
+	}
+
+	public boolean isSanctified() {
+		return sanctified;
+	}
+
+	public void setSanctified(boolean sanctified) {
+		this.sanctified = sanctified;
 	}
 
 }

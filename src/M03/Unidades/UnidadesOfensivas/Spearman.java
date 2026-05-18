@@ -1,4 +1,4 @@
-package M03;
+package M03.Unidades.UnidadesOfensivas;
 
 public class Spearman extends AttackUnit {
 

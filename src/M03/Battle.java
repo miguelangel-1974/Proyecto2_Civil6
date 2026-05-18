@@ -2,6 +2,18 @@ package M03;
 
 import java.util.ArrayList;
 
+import M03.Unidades.UnidadesDefensivas.ArrowTower;
+import M03.Unidades.UnidadesDefensivas.Catapult;
+import M03.Unidades.UnidadesDefensivas.DefenseUnit;
+import M03.Unidades.UnidadesDefensivas.RocketLauncherTower;
+import M03.Unidades.UnidadesEspeciales.Magician;
+import M03.Unidades.UnidadesEspeciales.Priest;
+import M03.Unidades.UnidadesOfensivas.AttackUnit;
+import M03.Unidades.UnidadesOfensivas.Cannon;
+import M03.Unidades.UnidadesOfensivas.Crossbow;
+import M03.Unidades.UnidadesOfensivas.Spearman;
+import M03.Unidades.UnidadesOfensivas.Swordsman;
+
 public class Battle implements Variables {
 
 	private Civilization civilization;

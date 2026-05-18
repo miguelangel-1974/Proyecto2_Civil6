@@ -1,39 +1,35 @@
-package M03;
+package M03.Unidades.UnidadesEspeciales;
 
-public class Catapult extends DefenseUnit {
+public class Priest extends SpecialUnit {
 
-	public Catapult(int armor, int baseDamage) {
+	public Priest(int armor, int baseDamage) {
 		this.setArmor(armor);
 		this.setInitialArmor(armor);
 		this.setBaseDamage(baseDamage);
 		this.setExperience(0);
-		this.setSanctified(false);
 	}
 	
-
 	public int getFoodCost() {
-		return FOOD_COST_CATAPULT;
+		return FOOD_COST_PRIEST;
 	}
 
 	public int getWoodCost() {
-		return WOOD_COST_CATAPULT;
+		return WOOD_COST_PRIEST;
 	}
 
 	public int getIronCost() {
-		return IRON_COST_CATAPULT;
+		return IRON_COST_PRIEST;
 	}
 
 	public int getManaCost() {
-		return MANA_COST_CATAPULT;
+		return MANA_COST_PRIEST;
 	}
 
 	public int getChanceGeneratinWaste() {
-		return CHANCE_GENERATNG_WASTE_CATAPULT;
+		return CHANCE_GENERATNG_WASTE_PRIEST;
 	}
 
 	public int getChanceAttackAgain() {
-		return CHANCE_ATTACK_AGAIN_CATAPULT;
+		return CHANCE_ATTACK_AGAIN_PRIEST;
 	}
-
-	
 }
