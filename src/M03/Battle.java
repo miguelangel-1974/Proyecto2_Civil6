@@ -282,13 +282,12 @@ public class Battle implements Variables {
 			ArrayList<MilitaryUnit> grupoAt = this.armies.get(bandoAtacante).get(grupoAtacante);
 
 			if (grupoAt.isEmpty()) {
-				bandoAtacante = 1 - bandoAtacante;
 				continue;
 			}
 
 			this.battleDevelopment = this.battleDevelopment
 					+ "********************CHANGE ATTACKER********************\n";
-			
+
 			int idxAtacante = (int) (Math.random() * grupoAt.size());
 			MilitaryUnit atacante = grupoAt.get(idxAtacante);
 
