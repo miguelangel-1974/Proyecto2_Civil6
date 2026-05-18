@@ -7,9 +7,9 @@ public interface Variables {
 	public final int AUTO_GENERATE_BATTLE = 180000;
 
 	// resources available to create the first enemy fleet
-	public final int IRON_BASE_ENEMY_ARMY = 4000;
-	public final int WOOD_BASE_ENEMY_ARMY = 35000;
-	public final int FOOD_BASE_ENEMY_ARMY = 18000;
+	public final int IRON_BASE_ENEMY_ARMY = 3000;
+	public final int WOOD_BASE_ENEMY_ARMY = 28000;
+	public final int FOOD_BASE_ENEMY_ARMY = 15000;
 
 	// percentage increase of resources available to create enemy fleet
 	public final int ENEMY_FLEET_INCREASE = 6;
@@ -122,30 +122,30 @@ public interface Variables {
 	public final int IRON_COST_MAGICTOWER = 6000;
 
 	// BASE DAMAGE ATTACK UNITS
-	public final int BASE_DAMAGE_SWORDSMAN = 80;
-	public final int BASE_DAMAGE_SPEARMAN = 150;
-	public final int BASE_DAMAGE_CROSSBOW = 1000;
-	public final int BASE_DAMAGE_CANNON = 700;
+	public final int BASE_DAMAGE_SWORDSMAN = 130;
+	public final int BASE_DAMAGE_SPEARMAN = 190;
+	public final int BASE_DAMAGE_CROSSBOW = 420;
+	public final int BASE_DAMAGE_CANNON = 360;
 
 	// BASE DAMAGE DEFENSES
-	public final int BASE_DAMAGE_ARROWTOWER = 80;
-	public final int BASE_DAMAGE_CATAPULT = 250;
-	public final int BASE_DAMAGE_ROCKETLAUNCHERTOWER = 2000;
-	public final int BASE_DAMAGE_MAGICIAN = 3000;
+	public final int BASE_DAMAGE_ARROWTOWER = 140;
+	public final int BASE_DAMAGE_CATAPULT = 240;
+	public final int BASE_DAMAGE_ROCKETLAUNCHERTOWER = 650;
+	public final int BASE_DAMAGE_MAGICIAN = 750;
 
 	// ARMOR ATTACK UNITS
-	public final int ARMOR_SWORDSMAN = 400;
-	public final int ARMOR_SPEARMAN = 1000;
-	public final int ARMOR_CROSSBOW = 6000;
-	public final int ARMOR_CANNON = 8000;
+	public final int ARMOR_SWORDSMAN = 500;
+	public final int ARMOR_SPEARMAN = 900;
+	public final int ARMOR_CROSSBOW = 2000;
+	public final int ARMOR_CANNON = 2500;
 
 	// ARMOR DEFENSES
-	public final int ARMOR_ARROWTOWER = 200;
-	public final int ARMOR_CATAPULT = 1200;
-	public final int ARMOR_ROCKETLAUNCHERTOWER = 7000;
+	public final int ARMOR_ARROWTOWER = 600;
+	public final int ARMOR_CATAPULT = 1100;
+	public final int ARMOR_ROCKETLAUNCHERTOWER = 2800;
 
 	// ARMOR ESPECIALES
-	public final int ARMOR_MAGICIAN = 500;
+	public final int ARMOR_MAGICIAN = 450;
 	public final int ARMOR_PRIEST = 300;
 	// PLUS ARMOR ESPECIALES
 	public final int PLUS_ARMOR_MAGICIAN_BY_TECHNOLOGY = 5;
