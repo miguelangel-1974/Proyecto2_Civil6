@@ -4,7 +4,7 @@ public interface Variables {
 	// Variables de tiempos
 	public final int RESOURCES_GENERATOR_TIME = 30000;
 	public final int AUTO_SAVE_TIME = 60000;
-	public final int AUTO_GENERATE_BATTLE = 10000;
+	public final int AUTO_GENERATE_BATTLE = 180000;
 
 	// resources available to create the first enemy fleet
 	public final int IRON_BASE_ENEMY_ARMY = 3000;
