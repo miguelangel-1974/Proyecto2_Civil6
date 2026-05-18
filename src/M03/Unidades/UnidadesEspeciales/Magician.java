@@ -1,8 +1,8 @@
-package M03;
+package M03.Unidades.UnidadesEspeciales;
 
-public class Priest extends SpecialUnit {
+public class Magician extends SpecialUnit {
 
-	public Priest(int armor, int baseDamage) {
+	public Magician(int armor, int baseDamage) {
 		this.setArmor(armor);
 		this.setInitialArmor(armor);
 		this.setBaseDamage(baseDamage);
@@ -10,26 +10,27 @@ public class Priest extends SpecialUnit {
 	}
 	
 	public int getFoodCost() {
-		return FOOD_COST_PRIEST;
+		return FOOD_COST_MAGICIAN;
 	}
 
 	public int getWoodCost() {
-		return WOOD_COST_PRIEST;
+		return WOOD_COST_MAGICIAN;
 	}
 
 	public int getIronCost() {
-		return IRON_COST_PRIEST;
+		return IRON_COST_MAGICIAN;
 	}
 
 	public int getManaCost() {
-		return MANA_COST_PRIEST;
+		return MANA_COST_MAGICIAN;
 	}
 
 	public int getChanceGeneratinWaste() {
-		return CHANCE_GENERATNG_WASTE_PRIEST;
+		return CHANCE_GENERATNG_WASTE_MAGICIAN;
 	}
 
 	public int getChanceAttackAgain() {
-		return CHANCE_ATTACK_AGAIN_PRIEST;
+		return CHANCE_ATTACK_AGAIN_MAGICIAN;
 	}
+	
 }

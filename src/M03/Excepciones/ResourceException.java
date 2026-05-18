@@ -1,4 +1,4 @@
-package M03;
+package M03.Excepciones;
 
 public class ResourceException extends Exception {
 

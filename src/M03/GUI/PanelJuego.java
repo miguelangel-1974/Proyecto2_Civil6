@@ -35,13 +35,13 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import M03.Battle;
-import M03.BuildingException;
 import M03.Civilization;
 import M03.ConexionBD;
 import M03.EnemyArmyGenerator;
-import M03.ResourceException;
-import M03.ResourceGenerator;
 import M03.Variables;
+import M03.Excepciones.BuildingException;
+import M03.Excepciones.ResourceException;
+import M03.Excepciones.ResourceGenerator;
 
 class PanelJuego extends JPanel implements ActionListener, Variables {
  

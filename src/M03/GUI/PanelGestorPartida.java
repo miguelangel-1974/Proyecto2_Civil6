@@ -21,8 +21,8 @@ import javax.swing.JPanel;
 
 import M03.Civilization;
 import M03.ConexionBD;
-import M03.ResourceGenerator;
 import M03.Variables;
+import M03.Excepciones.ResourceGenerator;
 
 class PanelGestorPartida extends JPanel implements Variables {
 	private Image logo;

@@ -1,6 +1,9 @@
-package M03;
+package M03.Excepciones;
 
 import java.util.TimerTask;
+
+import M03.Civilization;
+import M03.Variables;
 
 public class ResourceGenerator extends TimerTask implements Variables {
 
