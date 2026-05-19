@@ -1,0 +1,158 @@
+<div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+    <div>
+        <h1 class="text-4xl font-serif font-bold text-white">
+            Informe Táctico <span class="text-red-500">#{{idBatalla}}</span>
+        </h1>
+        {{#if summary}}
+        <p class="text-slate-400 mt-1">
+            🏛️ <span class="text-white font-semibold">{{summary.civ_name}}</span>
+            &mdash; Comandante: <span class="text-blue-400 font-medium">{{summary.username}}</span>
+        </p>
+        {{/if}}
+    </div>
+    <div class="flex items-center gap-4">
+        {{#if (eq battleResult 'victoria')}}
+            <span class="bg-green-700/70 text-green-200 text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider">⚔️ Victoria</span>
+        {{else if (eq battleResult 'derrota')}}
+            <span class="bg-red-800/70 text-red-200 text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider">💀 Derrota</span>
+        {{else}}
+            <span class="bg-slate-700/70 text-slate-300 text-sm font-bold px-4 py-2 rounded-full uppercase tracking-wider">❓ Resultado desconocido</span>
+        {{/if}}
+        <a href="/batallas" class="text-blue-400 hover:text-white transition">&larr; Volver</a>
+    </div>
+</div>
+
+{{!-- BLOQUE RESUMEN --}}
+{{#if summary}}
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="glass-panel bg-slate-800/50 rounded-xl p-4 flex items-center gap-3">
+        <span class="text-4xl">🪵</span>
+        <div>
+            <p class="text-xs text-amber-500 font-bold uppercase">Madera</p>
+            <p class="text-2xl font-bold">+{{summary.wood_acquired}}</p>
+        </div>
+    </div>
+    <div class="glass-panel bg-slate-800/50 rounded-xl p-4 flex items-center gap-3">
+        <span class="text-4xl">🪨</span>
+        <div>
+            <p class="text-xs text-gray-400 font-bold uppercase">Hierro</p>
+            <p class="text-2xl font-bold">+{{summary.iron_acquired}}</p>
+        </div>
+    </div>
+    <div class="glass-panel bg-blue-900/30 rounded-xl p-4 flex items-center gap-3">
+        <span class="text-4xl">🛡️</span>
+        <div>
+            <p class="text-xs text-blue-400 font-bold uppercase">Bajas propias</p>
+            <p class="text-2xl font-bold text-blue-300">{{totalCivDrops}}</p>
+        </div>
+    </div>
+    <div class="glass-panel bg-red-900/30 rounded-xl p-4 flex items-center gap-3">
+        <span class="text-4xl">💀</span>
+        <div>
+            <p class="text-xs text-red-400 font-bold uppercase">Bajas enemigas</p>
+            <p class="text-2xl font-bold text-red-300">{{totalEnemyDrops}}</p>
+        </div>
+    </div>
+</div>
+{{/if}}
+
+{{!-- TABLAS DE BAJAS DETALLADAS --}}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+    {{!-- Bajas propias --}}
+    <div class="glass-panel rounded-xl overflow-hidden">
+        <div class="bg-blue-900/40 px-5 py-3 border-b border-blue-800/50">
+            <h2 class="font-bold text-blue-300 uppercase tracking-widest text-sm">🛡️ Bajas Propias</h2>
+        </div>
+        <div class="overflow-x-auto">
+            {{#if civAtkStats}}
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-400 text-xs uppercase">
+                        <th class="px-4 py-2">Tipo</th>
+                        <th class="px-4 py-2 text-center">Iniciales</th>
+                        <th class="px-4 py-2 text-center">Bajas</th>
+                        <th class="px-4 py-2 text-center">Supervivientes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each civAtkStats}}
+                    <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
+                        <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
+                        <td class="px-4 py-2 text-center text-red-400 font-bold">{{this.drops}}</td>
+                        <td class="px-4 py-2 text-center text-green-400">{{subtract this.initial this.drops}}</td>
+                    </tr>
+                    {{/each}}
+                    {{#each civDefStats}}
+                    <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
+                        <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
+                        <td class="px-4 py-2 text-center text-red-400 font-bold">{{this.drops}}</td>
+                        <td class="px-4 py-2 text-center text-green-400">{{subtract this.initial this.drops}}</td>
+                    </tr>
+                    {{/each}}
+                    {{#each civEspStats}}
+                    <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
+                        <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
+                        <td class="px-4 py-2 text-center text-red-400 font-bold">{{this.drops}}</td>
+                        <td class="px-4 py-2 text-center text-green-400">{{subtract this.initial this.drops}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+            <p class="text-slate-500 text-sm p-4">Sin datos de unidades propias.</p>
+            {{/if}}
+        </div>
+    </div>
+
+    {{!-- Bajas enemigas --}}
+    <div class="glass-panel rounded-xl overflow-hidden">
+        <div class="bg-red-900/40 px-5 py-3 border-b border-red-800/50">
+            <h2 class="font-bold text-red-300 uppercase tracking-widest text-sm">⚔️ Fuerzas Enemigas</h2>
+        </div>
+        <div class="overflow-x-auto">
+            {{#if enemyAtkStats}}
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-400 text-xs uppercase">
+                        <th class="px-4 py-2">Tipo</th>
+                        <th class="px-4 py-2 text-center">Iniciales</th>
+                        <th class="px-4 py-2 text-center">Eliminados</th>
+                        <th class="px-4 py-2 text-center">Restantes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each enemyAtkStats}}
+                    <tr class="border-t border-slate-800 hover:bg-slate-800/40 transition">
+                        <td class="px-4 py-2 font-semibold text-white capitalize">{{this.type}}</td>
+                        <td class="px-4 py-2 text-center text-slate-300">{{this.initial}}</td>
+                        <td class="px-4 py-2 text-center text-green-400 font-bold">{{this.drops}}</td>
+                        <td class="px-4 py-2 text-center text-red-400">{{subtract this.initial this.drops}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+            <p class="text-slate-500 text-sm p-4">Sin datos de unidades enemigas.</p>
+            {{/if}}
+        </div>
+    </div>
+
+</div>
+
+{{!-- LOG DE COMBATE --}}
+<div class="glass-panel rounded-2xl overflow-hidden">
+    <div class="bg-slate-800 px-6 py-4 border-b border-slate-700">
+        <h2 class="text-xl font-bold font-mono text-green-400">>_ Desarrollo del Combate</h2>
+    </div>
+    <div class="p-6 max-h-[600px] overflow-y-auto">
+        {{#if logText}}
+            <pre class="font-mono text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{{logText}}</pre>
+        {{else}}
+            <p class="text-red-400">El archivo de esta batalla está corrupto o aún no se ha procesado.</p>
+        {{/if}}
+    </div>
+</div>
