@@ -16,8 +16,8 @@ public interface Variables {
 
 	// resources increment every minute (tick)
 	public final int CIVILIZATION_IRON_GENERATED = 1500;
-	public final int CIVILIZATION_WOOD_GENERATED = 5000;
-	public final int CIVILIZATION_FOOD_GENERATED = 8000;
+	public final int CIVILIZATION_WOOD_GENERATED = 4000;
+	public final int CIVILIZATION_FOOD_GENERATED = 7000;
 
 	public final int CIVILIZATION_IRON_GENERATED_PER_SMITHY = (int) (0.5 * CIVILIZATION_IRON_GENERATED);
 	public final int CIVILIZATION_WOOD_GENERATED_PER_CARPENTRY = (int) (0.5 * CIVILIZATION_WOOD_GENERATED);

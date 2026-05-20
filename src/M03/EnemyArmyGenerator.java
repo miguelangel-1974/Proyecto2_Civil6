@@ -86,7 +86,7 @@ public class EnemyArmyGenerator extends TimerTask implements Variables {
 		}
 	}
 
-	public void viewThreat() {
+	public String viewThreat() {
 
 		int swordsmen = 0;
 		int spearmen = 0;
@@ -106,12 +106,12 @@ public class EnemyArmyGenerator extends TimerTask implements Variables {
 			}
 		}
 
-		System.out.println();
-		System.out.println("NEW threat COMMING");
-		System.out.println("Swordsman " + swordsmen);
-		System.out.println("Spearman  " + spearmen);
-		System.out.println("Crossbow  " + crossbows);
-		System.out.println("Cannon    " + cannons);
+		String enemigos = "Ejercito enemigo:";
+		enemigos += "\nSwordsman: " + swordsmen;
+		enemigos += "\nSpearman: " + spearmen;
+		enemigos += "\nCrossbow: " + crossbows;
+		enemigos += "\nCannon: " + cannons;
+		return enemigos;
 	}
 
 	public void run() {
