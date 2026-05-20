@@ -128,16 +128,15 @@ class PanelJuego extends JPanel implements ActionListener, Variables {
 		
 		timer.scheduleAtFixedRate(new TimerTask() {
 	        public void run() {
+	        	generarEnemigos.createEnemyArmy();
+	            Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
+	            
 	            JOptionPane.showMessageDialog(PanelJuego.this,
-	                "¡Se acerca un ejército enemigo!",
+	                "¡Se acerca un ejército enemigo!\n" + generarEnemigos.viewThreat(),
 	                "Va a comenzar una batalla",
 	                JOptionPane.WARNING_MESSAGE);
 
 	            timer.cancel();
-
-	            generarEnemigos.createEnemyArmy();
-	            Battle batalla = new Battle(miCiv, generarEnemigos.getEnemyArmy());
-	            generarEnemigos.viewThreat();
 	            batalla.pelear();
 	            
 	            conexion.guardarBatalla(batalla, idCiv);

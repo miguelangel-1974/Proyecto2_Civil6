@@ -4,7 +4,7 @@ public interface Variables {
 	// Variables de tiempos
 	public final int RESOURCES_GENERATOR_TIME = 30000;
 	public final int AUTO_SAVE_TIME = 60000;
-	public final int AUTO_GENERATE_BATTLE = 10000;
+	public final int AUTO_GENERATE_BATTLE = 180000;
 
 	// resources available to create the first enemy fleet
 	public final int IRON_BASE_ENEMY_ARMY = 4000;
@@ -16,8 +16,8 @@ public interface Variables {
 
 	// resources increment every minute (tick)
 	public final int CIVILIZATION_IRON_GENERATED = 1500;
-	public final int CIVILIZATION_WOOD_GENERATED = 5000;
-	public final int CIVILIZATION_FOOD_GENERATED = 8000;
+	public final int CIVILIZATION_WOOD_GENERATED = 4000;
+	public final int CIVILIZATION_FOOD_GENERATED = 7000;
 
 	public final int CIVILIZATION_IRON_GENERATED_PER_SMITHY = (int) (0.5 * CIVILIZATION_IRON_GENERATED);
 	public final int CIVILIZATION_WOOD_GENERATED_PER_CARPENTRY = (int) (0.5 * CIVILIZATION_WOOD_GENERATED);
